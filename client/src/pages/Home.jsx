@@ -17,16 +17,13 @@ const Home = () => {
             <div className='home-container'>
                 <div className="home-headlines">
                     <div className="headline-card">
-
+                        <h3>Mission</h3>
                     </div>
                     <div className="headline-card">
-
+                        <h3>Purpose</h3>    
                     </div>
                     <div className="headline-card">
-
-                    </div>
-                    <div className="headline-card">
-
+                        <h3>Mission</h3>
                     </div>
                 </div>
             </div>

@@ -63,7 +63,7 @@ const Scanner = () => {
     }
 
     const getScoreLabel = (score) => {
-        if (score >= 70) return 'Execelent'
+        if (score >= 70) return 'Excellent'
         if (score >= 40) return 'Moderate'
         return 'Poor'
     }

@@ -5,6 +5,8 @@ import Navbar from './components/Navbar/Navbar'
 import Home from './pages/Home'
 import Scanner from './pages/Scanner'
 import History from './pages/History'
+import Login from './pages/Login'
+import Footer from './components/Footer/Footer'
 
 function App() {
   return (
@@ -15,7 +17,9 @@ function App() {
             <Route path='/' element={<Home/>}/>
             <Route path='/scanner' element={<Scanner/>}/>
             <Route path='/history' element={<History/>}/>
+            <Route path='/login' element={<Login/>}/>
           </Routes>    
+          <Footer/>
         </BrowserRouter>
     </div>
   )
