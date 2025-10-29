@@ -1,0 +1,172 @@
+.scanner {
+    min-height: 100vh;
+
+    padding: 40px 20px;
+}
+
+/* Header */
+.scanner-header {
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+}
+
+.scanner-header h1 {
+    font-size: 3rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.file-input {
+    padding-top: 2rem;
+}
+
+/* Initial upload screen */
+.img-upload {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    padding: 60px 40px;
+    text-align: center;
+}
+
+.initial-upload p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+/* Preview container */
+.preview-container {
+    max-width: 800px;
+    margin: 0 auto 30px auto;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+}
+
+.preview-container img {
+    border-radius: 12px;
+}
+
+/* Analyze button */
+.analyze-btn {
+    display: block;
+    margin: 0 auto 30px auto;
+    padding: 16px 48px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Results section */
+.results {
+    margin: 0 auto;
+    border-radius: 16px;
+    padding: 40px;
+}
+
+/* Score section */
+.score-content {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 40px;
+}
+
+.score-content h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+.score-indicator {
+    width: 180px;
+    height: 180px;
+    border: 12px solid;
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-num {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.score-label {
+    font-size: 1rem;
+    margin-top: 5px;
+    font-weight: 600;
+}
+
+/* Metrics grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.metric-card {
+    padding: 25px;
+    border-radius: 12px;
+}
+
+.metric-card h3 {
+    font-size: 1.1rem;
+    margin: 0 0 10px 0;
+    font-weight: 600;
+}
+
+.metric-card p {
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* Summary card */
+.summary-card {
+    grid-column: 1 / -1;
+    padding: 25px;
+    border-radius: 12px;
+}
+
+.summary-card h3 {
+    font-size: 1.3rem;
+    margin: 0 0 15px 0;
+    font-weight: 600;
+}
+
+.summary-card p {
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* Reuse card */
+.reuse-card {
+    margin-top: 20px;
+    padding: 25px;
+    border-radius: 12px;
+}
+
+.reuse-card h3 {
+    font-size: 1.3rem;
+    margin: 0 0 15px 0;
+    font-weight: 600;
+}
+
+.reuse-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.reuse-card ul li {
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border-left: 3px solid #667eea;
+}

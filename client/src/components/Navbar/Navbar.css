@@ -1,0 +1,61 @@
+.navbar {
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: black;
+}
+
+.logo {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.logo img {
+    cursor: pointer;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 5rem;
+    padding: 0;
+    margin: 0 0 0 3rem;
+}
+
+.nav-menu li {
+    cursor: pointer;
+}
+
+.nav-menu li a {
+    color: white;
+    text-decoration: none;
+}
+
+.nav-menu li:hover,
+.nav-menu a:hover {
+    color: red;
+}
+
+.nav-login {
+    margin-left: auto;
+}
+
+.nav-login button {
+    border: none;
+    padding: .6rem 1.2rem;
+    border-radius: 25px;
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+}
+
+@media (max-width: 480px) {
+    
+}
+
+
