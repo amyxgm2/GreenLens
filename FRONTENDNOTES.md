@@ -5,3 +5,6 @@ Image Preview:
 
 App Reference
 - https://www.youtube.com/watch?v=7q-oshpKV8A
+
+File Upload:
+- https://uploadcare.com/blog/how-to-upload-file-in-react/
