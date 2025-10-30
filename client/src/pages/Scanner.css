@@ -1,13 +1,10 @@
 .scanner {
     min-height: 100vh;
-
     padding: 40px 20px;
 }
 
-/* Header */
 .scanner-header {
     text-align: center;
-    color: white;
     margin-bottom: 40px;
 }
 
@@ -18,31 +15,45 @@
 }
 
 .file-input {
-    padding-top: 2rem;
+    display: none;
 }
 
 /* Initial upload screen */
 .img-upload {
-    max-width: 600px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 16px;
-    padding: 60px 40px;
+    border: 1px solid red;
+    border-radius: 15px;
     text-align: center;
-}
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
 
-.initial-upload p {
-    font-size: 1.2rem;
-    margin-bottom: 30px;
+    position: fixed;
+    bottom: 0;
+    left: 25px;
+
+    margin: 0;
+    padding: 0;
 }
 
 /* Preview container */
 .preview-container {
-    max-width: 800px;
+    border: 1px solid blue;
+    max-width: 100px;
     margin: 0 auto 30px auto;
     border-radius: 16px;
     padding: 20px;
     text-align: center;
+
+    display: flex;
+    float: left;
+
+    position: fixed;
+    bottom: 0;
+    left: 26px;
+    align-items: center;
+    gap: 12px;
 }
 
 .preview-container img {
