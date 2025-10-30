@@ -3,3 +3,19 @@
   padding: 0;
 }
 
+body {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.App {
+  min-height: 100vh;
+}
