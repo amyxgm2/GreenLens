@@ -7,21 +7,21 @@ const Scanner = () => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [preview, setPreview] = useState(null)
+    // Need to edit server.js to have functining chat box
+    // const [inputText, setInputText] = useState("")
 
-    // Get file from the event. Called at return ()
     const handleFileChange = (e) => {
-        const selectedFile = e.target.files[0] // Get first file
-        setFile(e.target.files[0])
+        const selectedFile = e.target.files[0]
+        setFile(selectedFile)
         setResult(null)
         setError(null)
 
-        // Create Preview
         if (selectedFile) {
             const reader = new FileReader()
             reader.onloadend = () => {
-                setPreview(reader.result) // Save data
+                setPreview(reader.result)
             }
-            reader.readAsDataURL(selectedFile) // Convert to base64 string
+            reader.readAsDataURL(selectedFile)
         } else {
             setPreview(null)
         }
@@ -42,47 +42,58 @@ const Scanner = () => {
             const res = await fetch("http://localhost:4000/api/analyze", {
                 method: "POST",
                 body: formData,
-        })
+            })
 
-        if (!res.ok) throw new Error("Server error")
+            if (!res.ok) throw new Error("Server error")
 
-        const data = await res.json()
-        setResult(data)
+            const data = await res.json()
+            setResult(data)
         } catch (err) {
-        console.error(err)
-        setError("Something went wrong!")
+            console.error(err)
+            setError("Something went wrong!")
         } finally {
-        setLoading(false)
+            setLoading(false)
         }
     } 
 
     const getScoreColor = (score) => {
-        if (score >= 70) return '#10b981'
-        if (score >= 40) return '#f59e0b'
-        return '#ef4444'
+        if (score >= 70) return 'green'
+        if (score >= 40) return 'orange'
+        return 'red'
     }
 
     const getScoreLabel = (score) => {
-        if (score >= 70) return 'Execelent'
+        if (score >= 70) return 'Excellent'
         if (score >= 40) return 'Moderate'
         return 'Poor'
     }
 
     return (
         <div className="scanner">
-            <div className="scanner-header">
-                <h1>GreenLens</h1>
-            </div>
-
             <div className="main">
-                {/* Left side - Full preview */}
-                {preview && (
+                {/* Welcome message */}
+                {!file && !result && (
+                    <div className="welcome">
+                        <div className="welcome-msg">
+                            <h2>Welcome to GreenLens</h2>
+                            <p>I'm your AI sustainability assistant. Upload an image of any product, and I'll analyze its environmental impact, recyclability, and provide eco-friendly recommendations.</p>
+                        </div>
+                        
+                        <label htmlFor="file-input" className="upload-btn-center">
+                            <span className="img-upload">+</span>
+                            <input type="file" accept="image/*" onChange={handleFileChange} id="file-input" className="file-input" />
+                        </label>                   
+                    </div>
+                )}
+
+                {/* Full preview after analysis */}
+                {result && preview && (
                     <div className="full-preview">
                         <img src={preview} alt="Product" />
                     </div>
                 )}
 
-                {/* Right side - Results */}
+                {/* Results */}
                 {result && (
                     <div className="results">
                         <div className="score-content">
@@ -131,45 +142,53 @@ const Scanner = () => {
                                     ))}
                                 </ul>
                             </div>
-                        )}                    
+                        )}
                     </div>
-                )}    
+                )}
             </div>
 
-            {/* Bottom Left - Upload button and thumbnail */}
-            {!preview ? (
-                <label htmlFor="file-input" className="upload-button">
-                    <span className="img-upload">+</span>
-                    <input type="file" accept="image/*" onChange={handleFileChange} id="file-input" className="file-input" />
-                </label>
-            ) : (
-                <div className="upload-control">
-                    <img src={preview} alt="Thumbnail" className="thumbnail-preview" />
-                    <button onClick={() => {
-                            setPreview(null);
-                            setFile(null);
-                            setResult(null);
-                            const fileInput = document.getElementById('file-input');
-                            if (fileInput) fileInput.value = '';
-                        }} 
-                        className="delete-button"
-                        aria-label="Delete image"
-                    >
-                        X
-                    </button>
-                    
-                    <label htmlFor="file-input" className="upload-button">
-                        <span className="img-upload">+</span>
-                        <input type="file" accept="image/*" onChange={handleFileChange} id="file-input" className="file-input" />
-                    </label>
+            {/* Bottom chat input */}
+            <div className="chat-input-container">
+                <div className="chat-input-wrapper">
+                    <div className="chat-input-box">
+                        <span className="chat-input-text">
+                            {!file ? "Upload a product image to analyze..." : 
+                             result ? "Upload another product..." : 
+                             "Click analyze to get sustainability insights"}
+                        </span>
+                        
+                        <div className="upload-control">
+                            {preview && result && (
+                                <>
+                                    <img src={preview} alt="Thumbnail" className="thumbnail-preview" />
+                                    <button onClick={() => {
+                                            setPreview(null);
+                                            setFile(null);
+                                            setResult(null);
+                                            const fileInput = document.getElementById('file-input');
+                                            if (fileInput) fileInput.value = '';
+                                        }} 
+                                        className="delete-button"
+                                    >
+                                        ×
+                                    </button>
+                                </>
+                            )}
+                            
+                            {file && !result ? (
+                                <button onClick={handleSubmit} disabled={loading} className="analyze-btn">
+                                    {loading ? "..." : "→"}
+                                </button>
+                            ) : (
+                                <label htmlFor="file-input" className="upload-button">
+                                    <span className="img-upload">+</span>
+                                    <input type="file" accept="image/*" onChange={handleFileChange} id="file-input" className="file-input" />
+                                </label>
+                            )}
+                        </div>
+                    </div>
                 </div>
-            )}
-
-            {preview && !result && (
-                <button onClick={handleSubmit} disabled={loading} className="analyze-btn">
-                    {loading ? "Analyzing..." : "Analyze Product"}
-                </button>
-            )}
+            </div>
 
             {error && <p className="error-message">{error}</p>}
         </div>
