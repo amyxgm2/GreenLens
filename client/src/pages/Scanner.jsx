@@ -208,22 +208,30 @@ const Scanner = () => {
 
         {/* Chat Section */}
         {messages.length > 0 && (
-            <div className="mb-4">
-                <div className="card p-3" style={{ minHeight: "200px" }}>
-                    {messages.map((msg, i) => (
-                        <div key={i} className={`mb-3 ${msg.role === "user" ? "text-end" : "text-start"}`}>
-                            <div className={`d-inline-block p-3 rounded-3 ${
-                                msg.role === "user"
-                                ? "bg-light border"
-                                : "bg-body-secondary border"
-                            }`}
-                            >
-                            {msg.content}
-                            </div>
-                        </div>
-                    ))}
+        <div className="mb-4">
+            <div className="card p-3" style={{ minHeight: "200px" }}>
+            {messages.map((msg, i) => (
+                <div key={i} className={`mb-3 ${msg.role === "user" ? "text-end" : "text-start"}`}>
+                <div
+                    className={`d-inline-block p-3 rounded-3 ${
+                    msg.role === "user" ? "bg-light border" : "bg-body-secondary border"
+                    }`}
+                >
+                    {msg.content}
                 </div>
+                </div>
+            ))}
+
+            {/* AI typing indicator */}
+            {chatLoading && (
+                <div className="text-start mb-2">
+                <div className="d-inline-block p-3 rounded-3 bg-body-secondary border">
+                    <div className="dot-flashing"></div>
+                </div>
+                </div>
+            )}
             </div>
+        </div>
         )}
 
       {/* Input Bar */}
