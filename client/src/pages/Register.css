@@ -1,0 +1,131 @@
+/* ====== BASE STYLES ====== */
+body {
+  font-family: var(--bs-body-font-family, "Segoe UI", "Helvetica Neue", Arial, sans-serif);
+  font-size: 1rem;
+  line-height: 1.5;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  color: #212529;
+}
+
+/* ====== MAIN CONTAINER ====== */
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 90px);
+  background-color: #f8f9fa;
+  padding: 2rem;
+}
+
+/* ====== FORM WRAPPER ====== */
+.register--form {
+  width: 100%;
+  max-width: 380px;
+  padding: 2.5rem;
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* ====== TITLE ====== */
+.form--title {
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #343a40;
+}
+
+/* ====== MESSAGE BOX ====== */
+#message {
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #d1e7dd; /* success background */
+  color: #0f5132; /* success text */
+  border: 1px solid #badbcc;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+/* ====== INPUT GROUPS ====== */
+.register--your-info {
+  text-align: left;
+}
+
+.form--group {
+  margin-bottom: 1.25rem;
+}
+
+.form--group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.form--group input {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: transparent;
+}
+
+.form--group input:focus {
+  outline: none;
+  border-color: #1E9E1A; /* GreenLens green */
+  box-shadow: 0 0 0 0.2rem rgba(30, 158, 26, 0.25);
+}
+
+/* ====== ERROR TEXT ====== */
+.register--error {
+  margin-top: 0.3rem;
+  font-size: 0.875rem;
+  color: #d9534f;
+}
+
+/* ====== SUBMIT BUTTON ====== */
+.form-button {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  color: #fff;
+  background-color: #1E9E1A; 
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+.form-button:hover {
+  background-color: #157c13;
+}
+
+/* ====== SMALL TEXT ====== */
+.register--form small,
+.register--form p {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 576px) {
+  .register--form {
+    padding: 1.5rem;
+    max-width: 95%;
+  }
+}
+
+@media (min-width: 768px) {
+  .register--form {
+    padding: 3rem;
+  }
+}
