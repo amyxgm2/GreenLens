@@ -1,0 +1,24 @@
+.footer {
+    background-color: #a3bfa8;
+    color: black;
+}
+
+
+.footer a {
+    color: black;
+}
+
+
+.footer a:hover {
+    color: #cde7b0;
+}
+
+
+/*color: #1e9e1a;
+  color: #a3bfa8; green
+
+
+  color: #1e9e1a;
+  color: #cde7bo;  green
+
+
