@@ -18,16 +18,82 @@
   position: relative;
 }
 
+/* ===== BUTTON COLOR OVERRIDE ===== */
 .btn-primary {
-  background-color: #00a86b;
-  border-color: #00a86b;
+  background-color: #1E9E1A !important; /* GreenLens brand green */
+  border-color: #1E9E1A !important;
+  color: #fff !important;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  font-weight: 600;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 12px rgba(30, 158, 26, 0.25);
 }
 
-.btn-primary:hover {
-  background-color: #007f50;
-  border-color: #007f50;
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #157c13 !important; /* slightly darker on hover */
+  border-color: #157c13 !important;
+  transform: scale(1.03);
 }
 
+/* ===== FEATURE SECTION STYLES ===== */
+.feature-icon {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+/* === Custom circle colors === */
+.circle-green {
+  background-color: #1E9E1A; /* deep eco green */
+}
+
+.circle-sage {
+  background-color: #A3BFA8; /* sage tone */
+}
+
+.circle-lightgreen {
+  background-color: #CDE7B0; /* pastel green */
+}
+
+/* === Icon styling === */
+.custom-icon {
+  width: 4rem;
+  height: 4rem;
+  object-fit: contain;
+  filter: brightness(0) invert(1); /* make dark icons white */
+}
+
+/* ===== FEATURETTE SECTION STYLES ===== */
+.featurette-divider {
+  margin: 5rem 0; /* space between sections */
+}
+
+.featurette-heading {
+  font-size: 2.2rem;
+  letter-spacing: -0.5px;
+}
+
+.featurette p.lead {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.featurette-image {
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  object-fit: cover;
+}
 
 /* Responsive */
 @media (max-width: 768px) {

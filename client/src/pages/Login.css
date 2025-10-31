@@ -1,93 +1,113 @@
-.form-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem;
-    min-height: calc(100vh - 90px);
-    gap: 3rem;
-    opacity: 0;
-    transition: opacity 0.8s ease-in-out;
+/* ====== MAIN CONTAINER ====== */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 90px);
+  background-color: #f8f9fa;
+  padding: 2rem;
 }
 
-.form-container.fade-in {
-    opacity: 1;
+/* ====== FORM ====== */
+.login-form {
+  width: 100%;
+  max-width: 380px;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
-.form-content {
-    display: flex;
-    width: 100%;
-    max-width: 1200px;
-    backdrop-filter: blur(10px);
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(95, 67, 67, 0.3);
+/* ====== LOGO ====== */
+.login-logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 1rem;
 }
 
-.form-img {
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
+/* ====== INPUTS (FLOATING LABEL STYLE) ====== */
+.form-floating {
+  position: relative;
+  margin-bottom: 1rem;
 }
 
-.form-img img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    /*filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));*/
+.form-floating input {
+  width: 100%;
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+  padding: 1rem 0.75rem;
+  font-size: 1rem;
+  background-color: transparent;
+  transition: border-color 0.3s ease;
 }
 
-.form-signin {
-    width: 50%;
-    padding: 3rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+.form-floating input:focus {
+  outline: none;
+  border-color: #1E9E1A; /* GreenLens green */
 }
 
-.form-signin h2 {
-    font-size: 2.5rem;
-    font-weight: bold;
+.form-floating label {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  pointer-events: none;
 }
 
-.form-signin p {
-    margin-bottom: 2rem;
-    font-size: 1rem;
+.form-floating input:focus + label,
+.form-floating input:not(:placeholder-shown) + label {
+  top: -0.6rem;
+  left: 0.75rem;
+  font-size: 0.8rem;
+  background-color: #fff;
+  padding: 0 0.3rem;
+  color: #1E9E1A;
 }
 
-.form-signin label {
-    margin-bottom: 1.5rem;
+/* ====== BUTTON ====== */
+.btn-success {
+  background-color: #1E9E1A;
+  border: none;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
 }
 
-.form-signin input[type="text"],
-.form-signin input[type="password"] {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    margin-top: 0.5rem;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    transition: all 0.2s;
-    box-sizing: border-box;
+.btn-success:hover {
+  background-color: #157c13;
 }
 
-.form-signin input[type="text"]:focus,
-.form-signin input[type="password"]:focus {
-    outline: none;
+/* ====== CHECKBOX + TEXT ====== */
+.checkbox label {
+  font-size: 0.9rem;
+  color: #555;
 }
 
-.login-button {
-    width: 100%;
-    padding: 0.75rem;
-    color: white;
-    font-weight: 600;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.2s;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+/* ====== FOOTER TEXT ====== */
+.text-muted {
+  color: #6c757d !important;
+}
+
+.create-account-link {
+  color: #1E9E1A;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.create-account-link:hover {
+  text-decoration: underline;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 480px) {
+  .login-form {
+    padding: 1.5rem;
+  }
+
+  .login-logo {
+    width: 70px;
+  }
 }

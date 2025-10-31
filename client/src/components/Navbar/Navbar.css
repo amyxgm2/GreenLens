@@ -1,61 +1,182 @@
+/* ========== BASE NAVBAR ========== */
 .navbar {
-    color: white;
-    display: flex;
-    align-items: center;
-    padding: 1rem 2rem;
-    background: black;
+  background-color: white;          
+  color: #1E1E1E;                   /* dark text for contrast */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 2rem;
+  border-bottom: 1px solid #e0e0e0; /* subtle divider line */
+  position: relative;
+  z-index: 1000;
 }
 
-.logo {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
+/* ========== LEFT SECTION (Logo + Links) ========== */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
 .logo img {
-    cursor: pointer;
+  width: 120px;
+  height: auto;
+  cursor: pointer;
 }
 
+/* ========== NAV MENU ========== */
 .nav-menu {
-    display: flex;
-    list-style: none;
-    gap: 5rem;
-    padding: 0;
-    margin: 0 0 0 3rem;
-}
-
-.nav-menu li {
-    cursor: pointer;
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  transition: all 0.3s ease;
 }
 
 .nav-menu li a {
-    color: white;
-    text-decoration: none;
+  color: #1E1E1E; /* dark gray text */
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
-.nav-menu li:hover,
-.nav-menu a:hover {
-    color: red;
+.nav-menu li a:hover {
+  color: #1E9E1A; /* GreenLens accent color */
 }
 
+/* ========== LOGIN / REGISTER BUTTONS ========== */
 .nav-login {
-    margin-left: auto;
+  display: flex;
+  gap: 1rem;
 }
 
 .nav-login button {
-    border: none;
-    padding: .6rem 1.2rem;
-    border-radius: 25px;
-    cursor: pointer;
+  border: 1px solid #1E9E1A;
+  background-color: #1E9E1A;
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-/* Responsive */
+.nav-login button:hover {
+  background-color: #157c13;
+  border-color: #157c13;
+}
+
+/* ========== HAMBURGER MENU (Mobile) ========== */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.bar {
+  height: 3px;
+  width: 100%;
+  background-color: #1E1E1E; /* dark bars for white bg */
+  border-radius: 2px;
+}
+
+
+
+/* ========== RESPONSIVE STYLES ========== */
+
+/* Tablet */
+@media (max-width: 992px) {
+  .logo img {
+    width: 110px;
+  }
+
+  .nav-menu {
+    gap: 1.5rem;
+  }
+}
+
+/* Mobile view */
 @media (max-width: 768px) {
+  .menu-toggle {
+    display: flex;
+  }
 
+  .nav-left {
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .nav-menu {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    flex-direction: column;
+    background-color: white; /* ✅ matches navbar */
+    text-align: center;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    display: none;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .nav-menu.open {
+    display: flex;
+  }
+
+  .nav-login {
+    display: none; /* optional for mobile */
+  }
+
+  .nav-menu {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    flex-direction: column;
+    background-color: white;
+    text-align: center;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    display: none;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .nav-menu.open {
+    display: flex;
+  }
+
+  /* Hide desktop buttons */
+  .nav-login {
+    display: none;
+  }
+
+  /* Show these in hamburger menu */
+  .mobile-login,
+  .mobile-register {
+    display: block;
+  }
+
+  .nav-menu li a {
+    font-size: 1rem;
+    font-weight: 500;
+  }
 }
 
+/* Extra small screens */
 @media (max-width: 480px) {
-    
+  .logo img {
+    width: 90px;
+  }
+
+  .nav-menu {
+    gap: 1rem;
+  }
 }
-
-
