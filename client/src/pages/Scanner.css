@@ -1,10 +1,12 @@
+/* Scanner container */
 .scanner {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
 .main {
@@ -40,22 +42,65 @@
     line-height: 1.5;
 }
 
-/* Message bubble for results */
-.full-preview,
-.results {
+/* Results container - side by side layout */
+.results-container {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+}
+
+/* Image section - left side */
+.image-section {
+    flex: 0 0 400px;
     background: #f7f7f8;
     border-radius: 16px;
-    padding: 24px;
+    padding: 20px;
+}
+
+.image-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.image-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d2d2d;
+    margin: 0;
+    word-break: break-word;
+}
+
+.full-preview {
+    background: transparent;
+    padding: 0;
     margin-bottom: 16px;
 }
 
 .full-preview img {
     width: 100%;
-    max-width: 400px;
     height: auto;
     border-radius: 12px;
     display: block;
-    margin: 0 auto;
+}
+
+.image-footer {
+    padding-top: 12px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.image-footer p {
+    font-size: 0.875rem;
+    color: #5e5e5e;
+    margin: 0;
+}
+
+/* Stats section - right side */
+.stats-section {
+    flex: 1;
+    background: #f7f7f8;
+    border-radius: 16px;
+    padding: 24px;
 }
 
 /* Score section */
@@ -83,6 +128,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background: white;
 }
 
 .score-num {
@@ -110,6 +156,7 @@
 .metric-card {
     padding: 16px;
     border-radius: 12px;
+    background: white;
     border: 1px solid #e5e5e5;
 }
 
@@ -134,6 +181,7 @@
     grid-column: 1 / -1;
     padding: 20px;
     border-radius: 12px;
+    background: white;
     border: 1px solid #e5e5e5;
 }
 
@@ -156,6 +204,7 @@
     margin-top: 16px;
     padding: 20px;
     border-radius: 12px;
+    background: white;
     border: 1px solid #e5e5e5;
 }
 
@@ -192,12 +241,13 @@
     bottom: 0;
     left: 0;
     right: 0;
+    background: white;
     border-top: 1px solid #e5e5e5;
     padding: 16px;
 }
 
 .chat-input-wrapper {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     position: relative;
 }
@@ -287,6 +337,7 @@
 }
 
 .analyze-btn:disabled {
+    opacity: 0.5;
     cursor: not-allowed;
 }
 
@@ -310,4 +361,56 @@
 .upload-btn-center .img-upload {
     font-size: 2.5rem;
     color: #5e5e5e;
+}
+
+/* Error message */
+.error-message {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ef4444;
+    background: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 1px solid #ef4444;
+    font-size: 0.875rem;
+    font-weight: 500;
+    z-index: 1000;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .scanner {
+        padding: 12px;
+    }
+
+    .results-container {
+        flex-direction: column;
+    }
+    
+    .image-section {
+        flex: 1;
+        max-width: 100%;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chat-input-box {
+        padding: 12px 100px 12px 16px;
+    }
+
+    .welcome {
+        padding: 40px 12px;
+    }
+
+    .welcome-msg {
+        padding: 24px;
+    }
+
+    .chat-input-wrapper {
+        max-width: 100%;
+    }
 }
