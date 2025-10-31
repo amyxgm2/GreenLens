@@ -12,6 +12,8 @@
   "description": "",
   "dependencies": {
     "@google/genai": "^1.27.0",
+    "@supabase/supabase-js": "^2.78.0",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
