@@ -1,9 +1,29 @@
-.analyzed-image {
+.preview-img {
   width: 100%;
   height: auto;
   object-fit: cover;
   border-radius: 10px;
-  position: relative;
-  top: 0;
-  left: 0;
+  transition: 0.3s ease;
+}
+
+.preview-img:hover {
+  transform: scale(1.02);
+}
+
+input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.dot-flashing {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #666;
+  animation: dotFlashing 1s infinite linear alternate;
+}
+
+@keyframes dotFlashing {
+  0% { opacity: 0.2; }
+  100% { opacity: 1; }
 }

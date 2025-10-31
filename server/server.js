@@ -21,7 +21,10 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-let lastScan = null;
+// CHANGED: Store multiple scans instead of just one
+let analyzedScans = [];
+const MAX_SCANS = 10; // Keep last 10 images
+
 const supabase = createClient(
     process.env.SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -31,8 +34,6 @@ const supabase = createClient(
 const USERS = "user_info";
 const PUBLIC_USER = "id, username, first_name, last_name, email, status, created_at, login_active, logout_active"
 const PRIVATE_USER = "id, username, password, first_name, last_name, email, status, created_at, login_active, logout_active"
-
-// POST /api/analyze
 
 // 🧠 Helper: Safe Gemini call with retry + timeout
 async function safeGenerateContent(model, contents, retries = 3) {
@@ -132,9 +133,21 @@ Keep it concise, realistic, and JSON-only (no extra text).
       }));
     }
 
-    lastScan = jsonResponse;
+    // CHANGED: Store scan with timestamp and filename
+    const scanData = {
+      ...jsonResponse,
+      timestamp: new Date().toISOString(),
+      filename: req.file.originalname || "unknown",
+    };
+    
+    analyzedScans.push(scanData);
+    
+    // Keep only last MAX_SCANS images
+    if (analyzedScans.length > MAX_SCANS) {
+      analyzedScans.shift();
+    }
 
-    console.log("✅ AI Response:", jsonResponse);
+    console.log(`✅ AI Response (Total scans: ${analyzedScans.length}):`, jsonResponse);
     res.json(jsonResponse);
   } catch (err) {
     console.error("❌ Error analyzing image:", err);
@@ -152,11 +165,60 @@ Keep it concise, realistic, and JSON-only (no extra text).
 app.post("/api/chat", async (req, res) => {
   try {
     const { userMessage } = req.body;
-    if (!lastScan) {
+    
+    // CHANGED: Check if any scans exist
+    if (analyzedScans.length === 0) {
       return res
         .status(400)
         .json({ error: "Please analyze an image first before chatting." });
     }
+
+    // CHANGED: Include ALL analyzed scans in the context
+    const scansContext = analyzedScans.map((scan, idx) => ({
+      imageNumber: idx + 1,
+      filename: scan.filename,
+      greenScore: scan.greenScore,
+      energyUse: scan.energyUse,
+      recyclability: scan.recyclability,
+      summary: scan.summary,
+      communityImpact: scan.communityImpact,
+      dropOffInfo: scan.dropOffInfo,
+    }));
+
+    const prompt = `
+You are GreenLens AI, a friendly sustainability coach 🌿.
+
+The user has analyzed ${analyzedScans.length} product(s). Here's the data for all of them:
+
+${scansContext.map((scan, idx) => `
+Product ${idx + 1} (${scan.filename}):
+- Sustainability Score: ${scan.greenScore}/100
+- Summary: ${scan.summary}
+- Energy Use: ${scan.energyUse}
+- Recyclability: ${scan.recyclability}
+- Community Impact: ${scan.communityImpact}
+- Drop-off Info: ${scan.dropOffInfo}
+`).join('\n')}
+
+User asked: "${userMessage}"
+
+Respond in a conversational, empathetic tone (max 5 sentences). If they ask about a specific product, reference it by number or filename. Keep it helpful, realistic, and positive.
+`;
+
+    const chatResponse = await safeGenerateContent("gemini-2.0-flash", [
+      { text: prompt },
+    ]);
+
+    const reply = chatResponse.text?.trim() || "Sorry, I couldn't get that.";
+    console.log(`💬 Chat response (Context: ${analyzedScans.length} products)`);
+    res.json({ reply });
+  } catch (err) {
+    console.error("💬 Chat error:", err);
+    res.status(500).json({ error: "Chat service temporarily unavailable." });
+  }
+});
+
+// ============ AUTH ROUTES ============
 app.post("/api/register", async(req,res) =>{
     try{
         const{ username, email, password, first_name, last_name}= req.body;
@@ -198,7 +260,7 @@ app.post("/api/login", async (req,res) => {
 
         const {data: user,error } = await supabase
          .from(USERS)
-         .select(PRIVATE_USER) //copy public user, make it a private user and include the password there
+         .select(PRIVATE_USER)
          .or(`email.eq.${identifier}, username.eq.${identifier}`)
          .limit(1)
          .single();
@@ -213,19 +275,17 @@ app.post("/api/login", async (req,res) => {
         await supabase.from(USERS).update({ login_active: new Date().toISOString()}).eq("id", user.id);
 
         //return public fields only 
-
         const { password: _omit, ...publicUser } = user;
         res.json({ user: publicUser });
-            } catch (e) {
-                console.error("LOGIN_ERR:", e);
-                res.status(500).json({ error: "Login failed" });
-            }
+    } catch (e) {
+        console.error("LOGIN_ERR:", e);
+        res.status(500).json({ error: "Login failed" });
+    }
 });
 
-//logout
 app.post("/api/logout", async (req, res) => {
   try {
-    const { id } = req.body; // in real apps, derive from session/JWT
+    const { id } = req.body;
     if (!id) return res.status(400).json({ error: "id is required" });
 
     await supabase.from(USERS).update({ logout_active: new Date().toISOString() }).eq("id", id);
@@ -249,28 +309,6 @@ app.get("/api/users/:id", async (req, res) => {
   } catch (e) {
     console.error("GET_USER_ERR:", e);
     res.status(500).json({ error: "Failed to fetch user" });
-  }
-});
-
-    const prompt = `
-You are GreenLens AI, a friendly sustainability coach 🌿.
-Based on this analysis:
-${JSON.stringify(lastScan, null, 2)}
-
-User asked: "${userMessage}"
-
-Respond in a conversational, empathetic tone (max 5 sentences). Keep it helpful, realistic, and positive.
-`;
-
-    const chatResponse = await safeGenerateContent("gemini-2.0-flash", [
-      { text: prompt },
-    ]);
-
-    const reply = chatResponse.text?.trim() || "Sorry, I couldn’t get that.";
-    res.json({ reply });
-  } catch (err) {
-    console.error("💬 Chat error:", err);
-    res.status(500).json({ error: "Chat service temporarily unavailable." });
   }
 });
 
