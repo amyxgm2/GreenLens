@@ -9,7 +9,7 @@ const Login = () => {
           src="/GreenLens-Logo.svg"
           alt="GreenLens logo"
         />
-        <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
+        <h1 className="h3 mb-3 fw-normal">Please Login</h1>
 
         <div className="form-floating">
           <input
@@ -38,7 +38,7 @@ const Login = () => {
         </div>
 
         <button className="btn btn-success w-100 py-2" type="submit">
-          Sign in
+          Log in
         </button>
 
         <p className="mt-3 mb-0 text-muted">

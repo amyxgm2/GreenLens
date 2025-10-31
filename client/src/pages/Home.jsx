@@ -6,7 +6,7 @@ const Home = () => {
 
   return (
     <div className="homepage text-center">
-      {/* HERO SECTION - stays as video */}
+      {/* HERO SECTION - video */}
       <section className="hero position-relative text-white">
         <video
           className="hero-video position-absolute w-100 h-100 top-0 start-0"
@@ -18,13 +18,13 @@ const Home = () => {
           style={{ objectFit: 'cover' }}
         />
         <div className="container position-relative py-5">
-          <h1 className="display-4 fw-bold">GreenLens — AI Sustainability Scanner</h1>
-          <p className="lead mb-4">Scan Smarter, Shop Greener</p>
+          <h1 className="display-4 fw-bold">GreenLens</h1>
+          <p className="lead mb-4">Make choices that protect our planet</p>
           <button
             className="btn btn-primary btn-lg px-4"
             onClick={() => navigate('/scanner')}
           >
-            Start Scanning
+            Start Uploading
           </button>
         </div>
       </section>
@@ -40,8 +40,8 @@ const Home = () => {
               </div>
               <h3 className="fw-semibold">Mission</h3>
               <p>
-                To empower consumers with intelligent, transparent sustainability insights that transform
-                everyday purchases into environmentally responsible choices.
+                To make sustainability accessible by empowering people to instantly understand the environmental
+                impact of every product they scan.
               </p>
             </div>
 
@@ -52,14 +52,12 @@ const Home = () => {
               </div>
               <h3 className="fw-semibold">Values</h3>
               <p>
-                We promote a transition toward cleaner energy use by revealing the energy demands and emissions
-                behind each product.
+                Transparency, awareness, and action — we believe everyone deserves clear insight into how their
+                choices affect the planet.
               </p>
               <p>
-                We support a circular economy by encouraging reusing, recycling, or upcycling.
-              </p>
-              <p>
-                We make sustainability engaging with our AI-powered GreenScore and gamified rewards.
+                Our AI-driven sustainability scores inspire mindful habits and greener living through simple,
+                everyday decisions.
               </p>
             </div>
 
@@ -70,8 +68,8 @@ const Home = () => {
               </div>
               <h3 className="fw-semibold">Purpose</h3>
               <p>
-                GreenLens harnesses AI to make sustainability simple, measurable, and actionable — helping people
-                shop smarter and live greener.
+                To transform shopping into a sustainable act — one scan at a time. GreenLens helps consumers make
+                informed, eco-friendly decisions effortlessly.
               </p>
             </div>
           </div>

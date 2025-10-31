@@ -26,12 +26,13 @@
   margin-bottom: 1rem;
 }
 
-/* ====== INPUTS (FLOATING LABEL STYLE) ====== */
+/* ====== INPUTS (FIXED FLOATING LABEL STYLE) ====== */
 .form-floating {
   position: relative;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
+/* Input styling */
 .form-floating input {
   width: 100%;
   border: 1px solid #ced4da;
@@ -40,31 +41,31 @@
   font-size: 1rem;
   background-color: transparent;
   transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
+/* Focused input border color */
 .form-floating input:focus {
   outline: none;
-  border-color: #1E9E1A; /* GreenLens green */
+  border-color: #1E9E1A;
 }
 
+/* Label styling — moved fully above */
 .form-floating label {
   position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  color: #6c757d;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  pointer-events: none;
-}
-
-.form-floating input:focus + label,
-.form-floating input:not(:placeholder-shown) + label {
-  top: -0.6rem;
+  top: -0.8rem;  /* moves above input */
   left: 0.75rem;
   font-size: 0.8rem;
+  color: #1E9E1A;
   background-color: #fff;
   padding: 0 0.3rem;
-  color: #1E9E1A;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+/* Remove floating label transitions completely (static style) */
+.form-floating input::placeholder {
+  color: transparent; /* hide placeholder since label replaces it */
 }
 
 /* ====== BUTTON ====== */
@@ -74,6 +75,7 @@
   font-weight: 600;
   border-radius: 0.5rem;
   transition: background-color 0.2s ease;
+  padding: 0.6rem 0;
 }
 
 .btn-success:hover {
@@ -111,3 +113,5 @@
     width: 70px;
   }
 }
+
+
