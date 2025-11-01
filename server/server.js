@@ -14,66 +14,89 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json({ limit: "20mb" }));
 
-// Multer setup for image uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
-// ✅ Initialize Gemini (official new SDK)
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Gemini setup
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
+
+// Store multiple scans instead of just one
+let analyzedScans = [];
+const MAX_SCANS = 10; // Keep last 10 images
 
 const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
-    {auth: {persistSession: false}}
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  { auth: { persistSession: false } }
 );
 
 const USERS = "user_info";
 const PUBLIC_USER = "id, username, first_name, last_name, email, status, created_at, login_active, logout_active"
 const PRIVATE_USER = "id, username, password, first_name, last_name, email, status, created_at, login_active, logout_active"
 
-// POST /api/analyze
+// 🧠 Helper: Safe Gemini call with retry + timeout
+async function safeGenerateContent(model, contents, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 25000); // 25s timeout
+      const response = await ai.models.generateContent(
+        { model, contents },
+        { signal: controller.signal }
+      );
+      clearTimeout(timeout);
+      return response;
+    } catch (error) {
+      const code = error?.error?.code || error?.status || "unknown";
+      console.warn(`⚠️ Gemini call failed (attempt ${i + 1}):`, code);
+      if (i < retries - 1 && (code === 503 || code === "UNAVAILABLE")) {
+        console.log("Retrying in 2s...");
+        await new Promise((r) => setTimeout(r, 2000));
+        continue;
+      }
+      throw error;
+    }
+  }
+}
 
+// ============ IMAGE ANALYSIS ROUTE ============
 app.post("/api/analyze", upload.single("file"), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
-    // Convert uploaded file to Base64
     const base64 = req.file.buffer.toString("base64");
+    const mimeType = req.file.mimetype || "image/jpeg";
+    const userQuestion = req.body.userQuestion || ""; // Get user's question
 
-    //  Prompt for Gemini
-    const contents = [
-      {
-        inlineData: {
-          mimeType: req.file.mimetype || "image/jpeg",
-          data: base64,
-        },
-      },
-      {
-        text: `You are an environmental AI that analyzes product images for sustainability.
+    // First: Always generate the JSON analysis for the display card
+    const analysisPrompt = `
+You are an environmental AI that analyzes product images for sustainability.
 Return ONLY pure JSON in this format:
 {
   "greenScore": number (0-100),
-  "energyUse": string,
+  "energyUse": "One concise sentence describing energy or production impact.",
   "recyclability": "High|Medium|Low",
-  "ethics": "Good|Moderate|Poor",
-  "ecosystemImpact": "Minimal|Moderate|Severe",
-  "reuseIdeas": [string],
-  "summary": string
+  "communityImpact": "One short sentence on how reusing or donating this item helps the local community.",
+  "dropOffInfo": "Where to properly dispose or donate this product.",
+  "summary": "One short sentence summarizing overall sustainability."
 }
-Evaluate the product's sustainability, materials, and impact.`
-      }
+Keep it concise, realistic, and JSON-only (no extra text).
+    `;
+
+    const analysisContents = [
+      {
+        inlineData: {
+          mimeType,
+          data: base64,
+        },
+      },
+      { text: analysisPrompt },
     ];
 
-    // Generate content with Gemini 2.5 Flash
-    const resp = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents
-    });
+    const analysisResponse = await safeGenerateContent("gemini-2.0-flash", analysisContents);
 
-    let responseText = resp.text?.trim() || "";
-
-    // Clean possible markdown wrappers (```json ... ```)
+    let responseText = analysisResponse.text?.trim() || "";
     if (responseText.startsWith("```")) {
       responseText = responseText
         .replace(/^```json\s*/i, "")
@@ -81,91 +104,193 @@ Evaluate the product's sustainability, materials, and impact.`
         .trim();
     }
 
-    let jsonResponse;
+    let jsonAnalysis;
     try {
-      jsonResponse = JSON.parse(responseText);
-    } catch (err) {
-      console.error(" Could not parse JSON:", err);
-      jsonResponse = { raw: responseText };
+      jsonAnalysis = JSON.parse(responseText);
+    } catch {
+      console.error("❌ Failed to parse JSON, returning raw text");
+      jsonAnalysis = { raw: responseText };
     }
 
-    console.log("✅ AI Response:", jsonResponse);
-    res.json(jsonResponse);
+    // Store scan with timestamp and filename
+    const scanData = {
+      ...jsonAnalysis,
+      timestamp: new Date().toISOString(),
+      filename: req.file.originalname || "unknown",
+    };
+
+    analyzedScans.push(scanData);
+
+    // Keep only last MAX_SCANS images
+    if (analyzedScans.length > MAX_SCANS) {
+      analyzedScans.shift();
+    }
+
+    // Second: Generate conversational answer based on user's question
+    let conversationalAnswer;
+
+    if (userQuestion.trim()) {
+      // User asked a specific question
+      const questionPrompt = `
+You are GreenLens AI, a friendly sustainability coach 🌿.
+
+Based on this product analysis:
+${JSON.stringify(jsonAnalysis, null, 2)}
+
+The user asked: "${userQuestion}"
+
+Respond in a conversational, empathetic tone (max 5 sentences). Answer their specific question directly. Keep it helpful, realistic, and positive.
+`;
+
+      const questionResponse = await safeGenerateContent("gemini-2.0-flash", [
+        { text: questionPrompt },
+      ]);
+
+      conversationalAnswer = questionResponse.text?.trim() || "I've analyzed your product!";
+    } else {
+      // No question asked, give default summary
+      conversationalAnswer = `I've analyzed your product! Here's what I found:\n\nSustainability Score: ${jsonAnalysis.greenScore}/100\n\n${jsonAnalysis.summary}\n\nFeel free to ask me any questions about this product's environmental impact!`;
+    }
+
+    console.log(`✅ Analysis complete (Total scans: ${analyzedScans.length})`);
+
+    res.json({
+      analysis: jsonAnalysis,  // JSON data for the display card
+      answer: conversationalAnswer  // Conversational answer for chat
+    });
   } catch (err) {
-    console.error("Error analyzing image:", err);
-    res.status(500).json({ error: err.message });
+    console.error("❌ Error analyzing image:", err);
+    if (err.message?.includes("overloaded") || err.status === 503) {
+      return res.status(503).json({
+        error:
+          "AI model is currently busy or overloaded. Please try again in a few seconds.",
+      });
+    }
+    res.status(500).json({ error: "Unexpected server error." });
   }
 });
 
-app.post("/api/register", async(req,res) =>{
-    try{
-        const{ username, email, password, first_name, last_name}= req.body;
-        if(!username || !email || !password){
-            return res.status(400).json({error: "username, email, & password is required."});
-        }
+// ============ CHAT ROUTE ============
+app.post("/api/chat", async (req, res) => {
+  try {
+    const { userMessage } = req.body;
 
-        //hash password
-        const hash = await bcrypt.hash(String(password), 12);
-
-        const { data, error } = await supabase
-        .from(USERS)
-        .insert({
-            username, 
-            email,
-            password: hash, 
-            first_name: first_name || null, 
-            last_name: last_name || null, 
-            status: "active",
-            created_at: new Date().toISOString()
-        })
-        .select(PUBLIC_USER)
-        .single();
-
-        if(error) return res.status(400).json({ error: error.message});
-        res.status(201).json({ user: data});
-    } catch (e){
-        console.error("REGISTER_ERR:", e);
-        res.status(500).json({error: "Registration failed"});
+    // Check if any scans exist
+    if (analyzedScans.length === 0) {
+      return res
+        .status(400)
+        .json({ error: "Please analyze an image first before chatting." });
     }
+
+    // Include ALL analyzed scans in the context
+    const scansContext = analyzedScans.map((scan, idx) => ({
+      imageNumber: idx + 1,
+      filename: scan.filename,
+      greenScore: scan.greenScore,
+      energyUse: scan.energyUse,
+      recyclability: scan.recyclability,
+      summary: scan.summary,
+      communityImpact: scan.communityImpact,
+      dropOffInfo: scan.dropOffInfo,
+    }));
+
+    const prompt = `
+You are GreenLens AI, a friendly sustainability coach 🌿.
+
+The user has analyzed ${analyzedScans.length} product(s). Here's the data for all of them:
+
+${scansContext.map((scan, idx) => `
+Product ${idx + 1} (${scan.filename}):
+- Sustainability Score: ${scan.greenScore}/100
+- Summary: ${scan.summary}
+- Energy Use: ${scan.energyUse}
+- Recyclability: ${scan.recyclability}
+- Community Impact: ${scan.communityImpact}
+- Drop-off Info: ${scan.dropOffInfo}
+`).join('\n')}
+
+User asked: "${userMessage}"
+
+Respond in a conversational, empathetic tone (max 5 sentences). If they ask about a specific product, reference it by number or filename. Keep it helpful, realistic, and positive.
+`;
+
+    const chatResponse = await safeGenerateContent("gemini-2.0-flash", [
+      { text: prompt },
+    ]);
+
+    const reply = chatResponse.text?.trim() || "Sorry, I couldn't get that.";
+    console.log(`💬 Chat response (Context: ${analyzedScans.length} products)`);
+    res.json({ reply });
+  } catch (err) {
+    console.error("💬 Chat error:", err);
+    res.status(500).json({ error: "Chat service temporarily unavailable." });
+  }
 });
 
-app.post("/api/login", async (req,res) => {
-    try{
-        const { identifier, password } = req.body;
-        if(!identifier || !password){
-            return res.status(400).json({error: "username and password are required"});
-        }
+// ============ AUTH ROUTES ============
+app.post("/api/register", async (req, res) => {
+  try {
+    const { username, email, password, first_name, last_name } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: "username, email, & password is required." });
+    }
 
-        const {data: user,error } = await supabase
-         .from(USERS)
-         .select(PRIVATE_USER) //copy public user, make it a private user and include the password there
-         .or(`email.eq.${identifier}, username.eq.${identifier}`)
-         .limit(1)
-         .single();
+    const hash = await bcrypt.hash(String(password), 12);
 
-        if (error || !user) return res.status(401).json({ error: "Invalid credentials"});
+    const { data, error } = await supabase
+      .from(USERS)
+      .insert({
+        username,
+        email,
+        password: hash,
+        first_name: first_name || null,
+        last_name: last_name || null,
+        status: "active",
+        created_at: new Date().toISOString()
+      })
+      .select(PUBLIC_USER)
+      .single();
 
-        //compare hash
-        const ok = await bcrypt.compare(String(password), user.password || "");
-        if (!ok) return res.status(401).json({ error: "Invalid credentials"});
-
-        //update login timestamp
-        await supabase.from(USERS).update({ login_active: new Date().toISOString()}).eq("id", user.id);
-
-        //return public fields only 
-
-        const { password: _omit, ...publicUser } = user;
-        res.json({ user: publicUser });
-            } catch (e) {
-                console.error("LOGIN_ERR:", e);
-                res.status(500).json({ error: "Login failed" });
-            }
+    if (error) return res.status(400).json({ error: error.message });
+    res.status(201).json({ user: data });
+  } catch (e) {
+    console.error("REGISTER_ERR:", e);
+    res.status(500).json({ error: "Registration failed" });
+  }
 });
 
-//logout
+app.post("/api/login", async (req, res) => {
+  try {
+    const { identifier, password } = req.body;
+    if (!identifier || !password) {
+      return res.status(400).json({ error: "username and password are required" });
+    }
+
+    const { data: user, error } = await supabase
+      .from(USERS)
+      .select(PRIVATE_USER)
+      .or(`email.eq.${identifier}, username.eq.${identifier}`)
+      .limit(1)
+      .single();
+
+    if (error || !user) return res.status(401).json({ error: "Invalid credentials" });
+
+    const ok = await bcrypt.compare(String(password), user.password || "");
+    if (!ok) return res.status(401).json({ error: "Invalid credentials" });
+
+    await supabase.from(USERS).update({ login_active: new Date().toISOString() }).eq("id", user.id);
+
+    const { password: _omit, ...publicUser } = user;
+    res.json({ user: publicUser });
+  } catch (e) {
+    console.error("LOGIN_ERR:", e);
+    res.status(500).json({ error: "Login failed" });
+  }
+});
+
 app.post("/api/logout", async (req, res) => {
   try {
-    const { id } = req.body; // in real apps, derive from session/JWT
+    const { id } = req.body;
     if (!id) return res.status(400).json({ error: "id is required" });
 
     await supabase.from(USERS).update({ logout_active: new Date().toISOString() }).eq("id", id);
@@ -192,14 +317,11 @@ app.get("/api/users/:id", async (req, res) => {
   }
 });
 
-// Root Route (for testing)
-
+// ============ ROOT ============
 app.get("/", (_req, res) => {
-  res.send("🌿 GreenLens Gemini 2.5 API is running successfully!");
+  res.send("🌎 GreenLens AI API is online and running!");
 });
 
-//  Start Server
-
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () =>
+  console.log(`✅ Server running efficiently on http://localhost:${PORT}`)
+);

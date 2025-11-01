@@ -20,7 +20,7 @@
 
 /* ===== BUTTON COLOR OVERRIDE ===== */
 .btn-primary {
-  background-color: #1E9E1A !important; /* GreenLens brand green */
+  background-color: #1E9E1A !important;
   border-color: #1E9E1A !important;
   color: #fff !important;
   transition: background-color 0.2s ease, transform 0.2s ease;
@@ -31,7 +31,7 @@
 
 .btn-primary:hover,
 .btn-primary:focus {
-  background-color: #157c13 !important; /* slightly darker on hover */
+  background-color: #157c13 !important;
   border-color: #157c13 !important;
   transform: scale(1.03);
 }
@@ -53,17 +53,11 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
 }
 
-/* === Custom circle colors === */
-.circle-green {
-  background-color: #1E9E1A; /* deep eco green */
-}
-
-.circle-sage {
-  background-color: #A3BFA8; /* sage tone */
-}
-
+/* === Unified circle color === */
+.circle-green,
+.circle-sage,
 .circle-lightgreen {
-  background-color: #CDE7B0; /* pastel green */
+  background-color: #1E9E1A; /* unified deep eco green */
 }
 
 /* === Icon styling === */
@@ -76,7 +70,7 @@
 
 /* ===== FEATURETTE SECTION STYLES ===== */
 .featurette-divider {
-  margin: 5rem 0; /* space between sections */
+  margin: 5rem 0;
 }
 
 .featurette-heading {
@@ -95,11 +89,3 @@
   object-fit: cover;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-
-}
-
-@media (max-width: 480px) {
-    
-}

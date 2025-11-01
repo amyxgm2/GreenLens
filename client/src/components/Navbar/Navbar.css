@@ -1,17 +1,18 @@
 /* ========== BASE NAVBAR ========== */
 .navbar {
-  background-color: white;          
-  color: #1E1E1E;                   /* dark text for contrast */
+  background-color: white;
+  color: #1E1E1E;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.8rem 2rem;
-  border-bottom: 1px solid #e0e0e0; /* subtle divider line */
+  border-bottom: 1px solid #e0e0e0;
   position: relative;
   z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* ========== LEFT SECTION (Logo + Links) ========== */
+/* ========== LEFT SECTION ========== */
 .nav-left {
   display: flex;
   align-items: center;
@@ -36,17 +37,17 @@
 }
 
 .nav-menu li a {
-  color: #1E1E1E; /* dark gray text */
+  color: #1E1E1E;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .nav-menu li a:hover {
-  color: #1E9E1A; /* GreenLens accent color */
+  color: #1E9E1A;
 }
 
-/* ========== LOGIN / REGISTER BUTTONS ========== */
+/* ========== LOGIN / REGISTER (DESKTOP) ========== */
 .nav-login {
   display: flex;
   gap: 1rem;
@@ -78,20 +79,27 @@
   background: transparent;
   border: none;
   cursor: pointer;
+  z-index: 1100;
 }
 
 .bar {
   height: 3px;
   width: 100%;
-  background-color: #1E1E1E; /* dark bars for white bg */
+  background-color: #1E1E1E;
   border-radius: 2px;
 }
 
+/* Hide mobile-only links by default */
+.mobile-only {
+  display: none;
+}
 
+/* Hide desktop-only content on mobile */
+.desktop-only {
+  display: flex;
+}
 
-/* ========== RESPONSIVE STYLES ========== */
-
-/* Tablet */
+/* ========== RESPONSIVE ========== */
 @media (max-width: 992px) {
   .logo img {
     width: 110px;
@@ -102,7 +110,7 @@
   }
 }
 
-/* Mobile view */
+/* ===== MOBILE ===== */
 @media (max-width: 768px) {
   .menu-toggle {
     display: flex;
@@ -119,54 +127,35 @@
     left: 0;
     width: 100%;
     flex-direction: column;
-    background-color: white; /* ✅ matches navbar */
-    text-align: center;
-    gap: 1.5rem;
-    padding: 1.5rem 0;
-    display: none;
-    border-top: 1px solid #e0e0e0;
-  }
-
-  .nav-menu.open {
-    display: flex;
-  }
-
-  .nav-login {
-    display: none; /* optional for mobile */
-  }
-
-  .nav-menu {
-    position: absolute;
-    top: 70px;
-    left: 0;
-    width: 100%;
-    flex-direction: column;
     background-color: white;
     text-align: center;
     gap: 1.5rem;
     padding: 1.5rem 0;
-    display: none;
     border-top: 1px solid #e0e0e0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
   }
 
   .nav-menu.open {
-    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
   }
 
   /* Hide desktop buttons */
-  .nav-login {
+  .desktop-only {
     display: none;
   }
 
-  /* Show these in hamburger menu */
-  .mobile-login,
-  .mobile-register {
+  /* Show mobile links inside dropdown */
+  .mobile-only {
     display: block;
   }
 
   .nav-menu li a {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 1.1rem;
   }
 }
 
@@ -180,3 +169,4 @@
     gap: 1rem;
   }
 }
+
