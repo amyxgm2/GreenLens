@@ -45,7 +45,7 @@ export default function Register() {
       setMessage("");
 
       // 🔗 Connect to backend
-      const res = await fetch("https://greenlens-50r4.onrender.com/api/register", {
+      const res = await fetch("https://greenlens-ez5z.onrender.com/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
