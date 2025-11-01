@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import './Register.css'
+import "./Register.css";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -12,6 +12,7 @@ export default function Register() {
 
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,7 +22,7 @@ export default function Register() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
@@ -35,16 +36,39 @@ export default function Register() {
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       setMessage("");
-    } else {
+      return;
+    }
+
+    try {
+      setLoading(true);
       setErrors({});
-      setMessage("Registration successful!");
-      console.log("Form data:", formData);
-      // Example: submit to backend
-      // fetch("/api/register", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(formData),
-      // })
+      setMessage("");
+
+      // 🔗 Connect to backend
+      const res = await fetch("http://localhost:4000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Registration failed.");
+      }
+
+      setMessage("✅ Registration successful! You can now log in.");
+      setFormData({
+        username: "",
+        email: "",
+        first_name: "",
+        last_name: "",
+        password: "",
+      });
+    } catch (err) {
+      setMessage(`❌ ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -129,7 +153,12 @@ export default function Register() {
             </div>
 
             {/* Submit Button */}
-            <input type="submit" className="form-button" value="Register" />
+            <input
+              type="submit"
+              className="form-button"
+              value={loading ? "Registering..." : "Register"}
+              disabled={loading}
+            />
           </div>
         </form>
       </main>
