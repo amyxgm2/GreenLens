@@ -161,15 +161,45 @@ const Scanner = () => {
 
     return (
         <>
-            <div className="container py-5" style={{ paddingBottom: "120px" }}>
-                {/* Header / Intro Section */}
+            <div className="container py-5" style={{ marginTop: "50px", minHeight: "calc(100vh - 200px)" }}>
+                {/* Header / Intro Section - Only show when no images uploaded */}
                 {analyzedImages.length === 0 && !file && (
-                    <div className="text-center mb-5">
+                    <div className="text-center mb-5" style={{ marginTop: "190px" }}>
                         <h1 className="fw-bold">Welcome to GreenLens!</h1>
-                        <h4 className="fw-normal">
+                        <h4 className="fw-normal" style={{ marginTop: "60px" }}>
                             Upload a product photo to analyze its eco impact, recyclability, and reuse potential.
                         </h4>
                     </div>
+                )}
+
+                {/* Show input form ONLY when no images have been analyzed yet */}
+                {analyzedImages.length === 0 && (
+                    <form className="d-flex align-items-center border rounded-3 p-2 bg-white"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+
+                            if (preview && !analyzedImages.find((img) => img.preview === preview)) {
+                                handleSubmit(); // Analyze image (with or without question)
+                            } else {
+                                setError("Please upload an image before submitting.");
+                            }
+                        }}
+                    >
+                        <input type="text" className="form-control border-0 shadow-none"
+                            placeholder="Upload a product image and optionally ask a question..."
+                            value={inputText}
+                            onChange={(e) => setInputText(e.target.value)}
+                        />
+
+                        <label htmlFor="file-input" className="btn btn-outline-secondary ms-2">
+                            +
+                            <input type="file" accept="image/*" id="file-input" className="d-none" onChange={handleFileChange} />
+                        </label>
+
+                        <button type="submit" className="btn btn-outline-secondary ms-2" disabled={loading || chatLoading}>
+                            {loading || chatLoading ? "..." : "→"}
+                        </button>
+                    </form>
                 )}
 
                 {/* Analyzed Images History */}
@@ -406,8 +436,8 @@ const Scanner = () => {
                                 >
                                     <div
                                         className={`d-inline-block p-3 rounded-3 ${msg.role === "user"
-                                                ? "bg-light border"
-                                                : "bg-body-secondary border"
+                                            ? "bg-light border"
+                                            : "bg-body-secondary border"
                                             }`}
                                         style={{ maxWidth: "80%" }}
                                     >
@@ -458,46 +488,50 @@ const Scanner = () => {
                 {error && <p className="text-danger mt-3">{error}</p>}
             </div>
 
-            {/* Fixed Input Bar at Bottom */}
-            <div>
-                <div className="container py-3">
-                    <form className="d-flex align-items-center border rounded-3 p-2 bg-white"
-                        onSubmit={(e) => {
-                            e.preventDefault();
+            {/* Fixed Input Bar at Bottom - Only show AFTER images have been analyzed */}
+            {analyzedImages.length > 0 && (
+                <div style={{
+                    backgroundColor: "white",
+                    borderTop: "1px solid #dee2e6",
+                    paddingTop: "20px",
+                    paddingBottom: "20px"
+                }}>
+                    <div className="container">
+                        <form className="d-flex align-items-center border rounded-3 p-2 bg-white"
+                            onSubmit={(e) => {
+                                e.preventDefault();
 
-                            if (preview && !analyzedImages.find((img) => img.preview === preview)) {
-                                handleSubmit(); // Analyze image (with or without question)
-                            } else if (analyzedImages.length > 0) {
-                                handleSendMessage(e); // Chat about existing images
-                            } else {
-                                setError("Please upload an image before submitting.");
-                            }
-                        }}
-                    >
-                        <input type="text" className="form-control border-0 shadow-none"
-                            placeholder={
-                                !file && analyzedImages.length === 0
-                                    ? "Upload a product image and optionally ask a question..."
-                                    : preview &&
-                                        !analyzedImages.find((img) => img.preview === preview)
+                                if (preview && !analyzedImages.find((img) => img.preview === preview)) {
+                                    handleSubmit(); // Analyze image (with or without question)
+                                } else if (analyzedImages.length > 0) {
+                                    handleSendMessage(e); // Chat about existing images
+                                } else {
+                                    setError("Please upload an image before submitting.");
+                                }
+                            }}
+                        >
+                            <input type="text" className="form-control border-0 shadow-none"
+                                placeholder={
+                                    preview && !analyzedImages.find((img) => img.preview === preview)
                                         ? "Ask a question about this image (optional)..."
                                         : "Ask about your products' sustainability..."
-                            }
-                            value={inputText}
-                            onChange={(e) => setInputText(e.target.value)}
-                        />
+                                }
+                                value={inputText}
+                                onChange={(e) => setInputText(e.target.value)}
+                            />
 
-                        <label htmlFor="file-input" className="btn btn-outline-secondary ms-2">
-                            +
-                            <input type="file" accept="image/*" id="file-input" className="d-none" onChange={handleFileChange}/>
-                        </label>
+                            <label htmlFor="file-input-bottom" className="btn btn-outline-secondary ms-2">
+                                +
+                                <input type="file" accept="image/*" id="file-input-bottom" className="d-none" onChange={handleFileChange} />
+                            </label>
 
-                        <button type="submit" className="btn btn-outline-secondary ms-2" disabled={loading || chatLoading}>
-                            {loading || chatLoading ? "..." : "→"}
-                        </button>
-                    </form>
+                            <button type="submit" className="btn btn-outline-secondary ms-2" disabled={loading || chatLoading}>
+                                {loading || chatLoading ? "..." : "→"}
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            )}
         </>
     );
 };

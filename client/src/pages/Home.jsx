@@ -22,8 +22,7 @@ const Home = () => {
           <p className="lead mb-4">Make choices that protect our planet</p>
           <button
             className="btn btn-primary btn-lg px-4"
-            onClick={() => navigate('/scanner')}
-          >
+            onClick={() => navigate('/analyzer')}>
             Start Uploading
           </button>
         </div>
