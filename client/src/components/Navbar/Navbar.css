@@ -1,15 +1,15 @@
 /* ========== BASE NAVBAR ========== */
 .navbar {
-  background-color: white;
-  color: #1E1E1E;
+  background-color: #000; 
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.8rem 2rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #111;
   position: relative;
   z-index: 1000;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* ========== LEFT SECTION ========== */
@@ -23,6 +23,7 @@
   width: 120px;
   height: auto;
   cursor: pointer;
+  filter: brightness(0) invert(1); /* make logo visible on dark background */
 }
 
 /* ========== NAV MENU ========== */
@@ -37,14 +38,14 @@
 }
 
 .nav-menu li a {
-  color: #1E1E1E;
+  color: #fff;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .nav-menu li a:hover {
-  color: #1E9E1A;
+  color: #1E9E1A; /* GreenLens green */
 }
 
 /* ========== LOGIN / REGISTER (DESKTOP) ========== */
@@ -56,7 +57,7 @@
 .nav-login button {
   border: 1px solid #1E9E1A;
   background-color: #1E9E1A;
-  color: white;
+  color: #fff;
   padding: 0.5rem 1.2rem;
   border-radius: 25px;
   cursor: pointer;
@@ -85,7 +86,7 @@
 .bar {
   height: 3px;
   width: 100%;
-  background-color: #1E1E1E;
+  background-color: #fff; /* white bars for contrast */
   border-radius: 2px;
 }
 
@@ -127,11 +128,11 @@
     left: 0;
     width: 100%;
     flex-direction: column;
-    background-color: white;
+    background-color: #000; /* match navbar background */
     text-align: center;
     gap: 1.5rem;
     padding: 1.5rem 0;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid #222;
     opacity: 0;
     pointer-events: none;
     transform: translateY(-10px);
@@ -156,6 +157,11 @@
 
   .nav-menu li a {
     font-size: 1.1rem;
+    color: #fff;
+  }
+
+  .nav-menu li a:hover {
+    color: #1E9E1A;
   }
 }
 
@@ -169,4 +175,5 @@
     gap: 1rem;
   }
 }
+
 
