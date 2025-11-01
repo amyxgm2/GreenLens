@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Scanner.css";
 
 const Scanner = () => {
     const [file, setFile] = useState(null); // Current selected img file
@@ -103,7 +102,6 @@ const Scanner = () => {
         }
     };
 
-
     // ---------- CHAT HANDLER ----------
     // Sends user msgs to the backend char endpoint
     // Displays AI replies to Analyzed Products section
@@ -202,7 +200,7 @@ const Scanner = () => {
                                         </div>
                                     </div>
 
-                                    <div className="col-md-7">
+                                    <div className="col-md-9">
                                         <div className="d-flex align-items-center mb-3">
                                             <h4 className="fw-bold mb-0">Sustainability Score</h4>
                                             <span
@@ -218,11 +216,7 @@ const Scanner = () => {
                                                 i
                                             </span>
                                         </div>
-                                        <h1
-                                            className={`fw-bold ${getScoreColor(
-                                                item.result.greenScore
-                                            )}`}
-                                        >
+                                        <h1 className={`fw-bold ${getScoreColor(item.result.greenScore)}`}>
                                             {item.result.greenScore}
                                         </h1>
                                         <p className="text-secondary">{item.result.summary}</p>
@@ -239,6 +233,18 @@ const Scanner = () => {
                                                         data-bs-target={`#energy-${item.id}`}
                                                     >
                                                         Energy Use
+                                                        <span
+                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                                            style={{
+                                                                width: "18px",
+                                                                height: "18px",
+                                                                fontSize: "11px",
+                                                                cursor: "help",
+                                                            }}
+                                                            title="Measures the carbon footprint and energy consumed during production, use, and disposal of the product."
+                                                        >
+                                                            i
+                                                        </span>
                                                     </button>
                                                 </h2>
                                                 <div
@@ -262,6 +268,18 @@ const Scanner = () => {
                                                         data-bs-target={`#recyclable-${item.id}`}
                                                     >
                                                         Recyclable
+                                                        <span
+                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                                            style={{
+                                                                width: "18px",
+                                                                height: "18px",
+                                                                fontSize: "11px",
+                                                                cursor: "help",
+                                                            }}
+                                                            title="Evaluates whether materials can be recycled and how easily they can be processed at recycling facilities."
+                                                        >
+                                                            i
+                                                        </span>
                                                     </button>
                                                 </h2>
                                                 <div
@@ -285,6 +303,18 @@ const Scanner = () => {
                                                         data-bs-target={`#community-${item.id}`}
                                                     >
                                                         Community Impact
+                                                        <span
+                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                                            style={{
+                                                                width: "18px",
+                                                                height: "18px",
+                                                                fontSize: "11px",
+                                                                cursor: "help",
+                                                            }}
+                                                            title="Assesses the product's effect on local communities, including labor practices and social responsibility."
+                                                        >
+                                                            i
+                                                        </span>
                                                     </button>
                                                 </h2>
                                                 <div
@@ -301,13 +331,20 @@ const Scanner = () => {
                                             {/* Drop-off Info */}
                                             <div className="accordion-item">
                                                 <h2 className="accordion-header">
-                                                    <button
-                                                        className="accordion-button collapsed"
-                                                        type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target={`#dropoff-${item.id}`}
-                                                    >
+                                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#dropoff-${item.id}`}>
                                                         Drop-off Locations
+                                                        <span
+                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                                            style={{
+                                                                width: "18px",
+                                                                height: "18px",
+                                                                fontSize: "11px",
+                                                                cursor: "help",
+                                                            }}
+                                                            title="Provides nearby recycling centers and facilities where you can properly dispose of this item."
+                                                        >
+                                                            i
+                                                        </span>
                                                     </button>
                                                 </h2>
                                                 <div
@@ -325,7 +362,21 @@ const Scanner = () => {
                                         {/* Reuse Ideas */}
                                         {item.result.reuseIdeas && item.result.reuseIdeas.length > 0 && (
                                             <div className="mt-4">
-                                                <h5 className="fw-bold mb-3">Ways to Reuse This Product</h5>
+                                                <div className="d-flex align-items-center mb-3">
+                                                    <h5 className="fw-bold mb-0">Ways to Reuse This Product</h5>
+                                                    <span
+                                                        className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                                        style={{
+                                                            width: "18px",
+                                                            height: "18px",
+                                                            fontSize: "11px",
+                                                            cursor: "help",
+                                                        }}
+                                                        title="Creative ways to repurpose and extend the life of this product before recycling or disposal."
+                                                    >
+                                                        i
+                                                    </span>
+                                                </div>
                                                 <ul className="list-group">
                                                     {item.result.reuseIdeas.map((idea, idx) => (
                                                         <li key={idx} className="list-group-item">
@@ -355,8 +406,8 @@ const Scanner = () => {
                                 >
                                     <div
                                         className={`d-inline-block p-3 rounded-3 ${msg.role === "user"
-                                            ? "bg-light border"
-                                            : "bg-body-secondary border"
+                                                ? "bg-light border"
+                                                : "bg-body-secondary border"
                                             }`}
                                         style={{ maxWidth: "80%" }}
                                     >
@@ -380,14 +431,8 @@ const Scanner = () => {
 
                 {/* Image Preview (Before Analysis) */}
                 {preview && !analyzedImages.find((img) => img.preview === preview) && (
-                    <div
-                        className="position-relative text-left mt-4"
-                        style={{ maxWidth: "250px", margin: "0" }}
-                    >
-                        <img
-                            src={preview}
-                            alt="Uploaded preview"
-                            className="img-thumbnail mb-2"
+                    <div className="position-relative text-left mt-4" style={{ maxWidth: "250px", margin: "0" }}>
+                        <img src={preview} alt="Uploaded preview" className="img-thumbnail mb-2"
                             style={{
                                 width: "100%",
                                 height: "auto",
@@ -395,14 +440,11 @@ const Scanner = () => {
                                 borderRadius: "10px",
                             }}
                         />
-
                         <div className="text-secondary small">
                             <p className="mb-1">{file?.name}</p>
                             <p>{(file?.size / 1024).toFixed(2)} KB</p>
                         </div>
-
-                        <button
-                            className="btn btn-outline-danger btn-sm mt-2"
+                        <button className="btn btn-outline-danger btn-sm mt-2"
                             onClick={() => {
                                 setFile(null);
                                 setPreview(null);
@@ -419,8 +461,7 @@ const Scanner = () => {
             {/* Fixed Input Bar at Bottom */}
             <div>
                 <div className="container py-3">
-                    <form
-                        className="d-flex align-items-center border rounded-3 p-2 bg-white"
+                    <form className="d-flex align-items-center border rounded-3 p-2 bg-white"
                         onSubmit={(e) => {
                             e.preventDefault();
 
@@ -433,9 +474,7 @@ const Scanner = () => {
                             }
                         }}
                     >
-                        <input
-                            type="text"
-                            className="form-control border-0 shadow-none"
+                        <input type="text" className="form-control border-0 shadow-none"
                             placeholder={
                                 !file && analyzedImages.length === 0
                                     ? "Upload a product image and optionally ask a question..."
@@ -448,25 +487,12 @@ const Scanner = () => {
                             onChange={(e) => setInputText(e.target.value)}
                         />
 
-                        <label
-                            htmlFor="file-input"
-                            className="btn btn-outline-secondary ms-2"
-                        >
+                        <label htmlFor="file-input" className="btn btn-outline-secondary ms-2">
                             +
-                            <input
-                                type="file"
-                                accept="image/*"
-                                id="file-input"
-                                className="d-none"
-                                onChange={handleFileChange}
-                            />
+                            <input type="file" accept="image/*" id="file-input" className="d-none" onChange={handleFileChange}/>
                         </label>
 
-                        <button
-                            type="submit"
-                            className="btn btn-outline-secondary ms-2"
-                            disabled={loading || chatLoading}
-                        >
+                        <button type="submit" className="btn btn-outline-secondary ms-2" disabled={loading || chatLoading}>
                             {loading || chatLoading ? "..." : "→"}
                         </button>
                     </form>

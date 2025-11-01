@@ -32,7 +32,7 @@ const Navbar = () => {
         {/* Nav menu (Home, Scanner, and mobile Login/Register) */}
         <ul className={`nav-menu ${isOpen ? 'open' : ''}`}>
           <li><Link to="/" onClick={handleLinkClick}>Home</Link></li>
-          <li><Link to="/scanner" onClick={handleLinkClick}>Scanner</Link></li>
+          <li><Link to="/analyzer" onClick={handleLinkClick}>Analyzer</Link></li>
           <li className="mobile-only"><Link to="/login" onClick={handleLinkClick}>Login</Link></li>
           <li className="mobile-only"><Link to="/register" onClick={handleLinkClick}>Register</Link></li>
         </ul>

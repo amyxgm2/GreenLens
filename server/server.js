@@ -75,11 +75,11 @@ app.post("/api/analyze", upload.single("file"), async (req, res) => {
       Return ONLY pure JSON in this format:
       {
         "greenScore": number (0-100),
-        "energyUse": "One concise sentence describing energy or production impact.",
+        "energyUse": "One to three concise sentences describing energy or production impact.",
         "recyclability": "High|Medium|Low",
-        "communityImpact": "One short sentence on how reusing or donating this item helps the local community.",
+        "communityImpact": "One to three short sentences on how reusing or donating this item helps the local community.",
         "dropOffInfo": "Where to properly dispose or donate this product.",
-        "summary": "One short sentence summarizing overall sustainability.",
+        "summary": "One to three short sentences summarizing overall sustainability.",
         "reuseIdeas": [
           "Creative reuse idea 1",
           "Creative reuse idea 2",
