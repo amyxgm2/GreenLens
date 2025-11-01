@@ -171,9 +171,6 @@ const Scanner = () => {
                         <h4 className="fw-normal">
                             Upload a product photo to analyze its eco impact, recyclability, and reuse potential.
                         </h4>
-                        <p className="text-secondary mt-3">
-                            Use one of the most common prompts below or start your own.
-                        </p>
 
                         {/* <div className="row justify-content-center g-3 mt-4">
                             {[
@@ -224,7 +221,21 @@ const Scanner = () => {
                                     </div>
 
                                     <div className="col-md-7">
-                                        <h4 className="fw-bold mb-3">Sustainability Score</h4>
+                                        <div className="d-flex align-items-center mb-3">
+                                            <h4 className="fw-bold mb-0">Sustainability Score</h4>
+                                            <span
+                                                className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                                style={{
+                                                    width: "20px",
+                                                    height: "20px",
+                                                    fontSize: "12px",
+                                                    cursor: "help",
+                                                }}
+                                                title="This score (0-100) evaluates the product's environmental impact based on energy use, recyclability, material sustainability, and community impact. Higher scores indicate more eco-friendly products."
+                                            >
+                                                i
+                                            </span>
+                                        </div>
                                         <h1
                                             className={`fw-bold ${getScoreColor(
                                                 item.result.greenScore
@@ -239,7 +250,7 @@ const Scanner = () => {
                                                 <p>{item.result.energyUse}</p>
                                             </div>
                                             <div className="col-md-6 col-lg-3">
-                                                <p className="fw-bold mb-1">Recycle</p>
+                                                <p className="fw-bold mb-1">Recyclable</p>
                                                 <p>{item.result.recyclability}</p>
                                             </div>
                                             <div className="col-md-6 col-lg-3">
