@@ -41,7 +41,7 @@ const Home = () => {
               <h3 className="fw-semibold">Mission</h3>
               <p>
                 To make sustainability accessible by empowering people to instantly understand the environmental
-                impact of every product they scan.
+                impact of every product they analyze.
               </p>
             </div>
 
@@ -52,7 +52,7 @@ const Home = () => {
               </div>
               <h3 className="fw-semibold">Values</h3>
               <p>
-                Transparency, awareness, and action — we believe everyone deserves clear insight into how their
+                Transparency, awareness, and action. We believe everyone deserves clear insight into how their
                 choices affect the planet.
               </p>
               <p>
@@ -68,7 +68,7 @@ const Home = () => {
               </div>
               <h3 className="fw-semibold">Purpose</h3>
               <p>
-                To transform shopping into a sustainable act — one scan at a time. GreenLens helps consumers make
+                To transform shopping into a sustainable act, one upload at a time. GreenLens helps consumers make
                 informed, eco-friendly decisions effortlessly.
               </p>
             </div>

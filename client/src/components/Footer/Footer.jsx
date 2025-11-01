@@ -7,7 +7,7 @@ const Footer = () => {
             <footer className="py-3 my-4">
                     <ul className="nav justify-content-center pb-3 mb-3">
                         <li className="nav-item"><a href="/" className="nav-link px-2 custom-text-body-secondary">Home</a></li>
-                        <li className="nav-item"><a href="/scanner" className="nav-link px-2 custom-text-body-secondary">Scanner</a></li>
+                        <li className="nav-item"><a href="/scanner" className="nav-link px-2 custom-text-body-secondary">Analyzer</a></li>
                         <li className="nav-item"><a href="/login" className="nav-link px-2 custom-text-body-secondary">Login</a></li>
                         <li className="nav-item"><a href="/register" className="nav-link px-2 custom-text-body-secondary">Register</a></li>
                     </ul>
