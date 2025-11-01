@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Scanner.css";
 
 const Scanner = () => {
     const [file, setFile] = useState(null); // Current selected img file
@@ -10,7 +9,7 @@ const Scanner = () => {
     const [preview, setPreview] = useState(null); // Stores Base64 preview of uploaded img
 
     // Chatbox
-    const [messages, setMessages] = useState([]); // Chat hisroryu
+    const [messages, setMessages] = useState([]); // Chat history
     const [inputText, setInputText] = useState(""); // Current user input txt
     const [chatLoading, setChatLoading] = useState(false); // Loading for chat
 
@@ -23,7 +22,7 @@ const Scanner = () => {
 
     // Handles file selection
     // Generate preview thumbnail
-    // Reset erroor state
+    // Reset error state
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
         setFile(selectedFile || null);
@@ -103,7 +102,6 @@ const Scanner = () => {
         }
     };
 
-
     // ---------- CHAT HANDLER ----------
     // Sends user msgs to the backend char endpoint
     // Displays AI replies to Analyzed Products section
@@ -171,24 +169,6 @@ const Scanner = () => {
                         <h4 className="fw-normal">
                             Upload a product photo to analyze its eco impact, recyclability, and reuse potential.
                         </h4>
-
-                        {/* <div className="row justify-content-center g-3 mt-4">
-                            {[
-                                "How can I reuse this?",
-                                "Summarize the image",
-                                "What does the sustainability score mean?",
-                                "How can I make an impact?",
-                            ].map((text, index) => (
-                                <div key={index} className="col-md-2 d-flex">
-                                    <div
-                                        className="card flex-fill d-flex align-items-center justify-content-center p-3 shadow-sm"
-                                        style={{ height: "120px" }}
-                                    >
-                                        {text}
-                                    </div>
-                                </div>
-                            ))}
-                        </div> */}
                     </div>
                 )}
 
@@ -220,7 +200,7 @@ const Scanner = () => {
                                         </div>
                                     </div>
 
-                                    <div className="col-md-7">
+                                    <div className="col-md-9">
                                         <div className="d-flex align-items-center mb-3">
                                             <h4 className="fw-bold mb-0">Sustainability Score</h4>
                                             <span
@@ -236,32 +216,176 @@ const Scanner = () => {
                                                 i
                                             </span>
                                         </div>
-                                        <h1
-                                            className={`fw-bold ${getScoreColor(
-                                                item.result.greenScore
-                                            )}`}
-                                        >
+                                        <h1 className={`fw-bold ${getScoreColor(item.result.greenScore)}`}>
                                             {item.result.greenScore}
                                         </h1>
                                         <p className="text-secondary">{item.result.summary}</p>
-                                        <div className="row text-center mt-3">
-                                            <div className="col-md-6 col-lg-3">
-                                                <p className="fw-bold mb-1">Energy Use</p>
-                                                <p>{item.result.energyUse}</p>
+
+                                        {/* Accordion for Details */}
+                                        <div className="accordion mt-3" id={`accordion-${item.id}`}>
+                                            {/* Energy Use */}
+                                            <div className="accordion-item">
+                                                <h2 className="accordion-header">
+                                                    <button
+                                                        className="accordion-button collapsed"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target={`#energy-${item.id}`}
+                                                    >
+                                                        Energy Use
+                                                        <span
+                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                                            style={{
+                                                                width: "18px",
+                                                                height: "18px",
+                                                                fontSize: "11px",
+                                                                cursor: "help",
+                                                            }}
+                                                            title="Measures the carbon footprint and energy consumed during production, use, and disposal of the product."
+                                                        >
+                                                            i
+                                                        </span>
+                                                    </button>
+                                                </h2>
+                                                <div
+                                                    id={`energy-${item.id}`}
+                                                    className="accordion-collapse collapse"
+                                                    data-bs-parent={`#accordion-${item.id}`}
+                                                >
+                                                    <div className="accordion-body">
+                                                        {item.result.energyUse}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="col-md-6 col-lg-3">
-                                                <p className="fw-bold mb-1">Recyclable</p>
-                                                <p>{item.result.recyclability}</p>
+
+                                            {/* Recyclable */}
+                                            <div className="accordion-item">
+                                                <h2 className="accordion-header">
+                                                    <button
+                                                        className="accordion-button collapsed"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target={`#recyclable-${item.id}`}
+                                                    >
+                                                        Recyclable
+                                                        <span
+                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                                            style={{
+                                                                width: "18px",
+                                                                height: "18px",
+                                                                fontSize: "11px",
+                                                                cursor: "help",
+                                                            }}
+                                                            title="Evaluates whether materials can be recycled and how easily they can be processed at recycling facilities."
+                                                        >
+                                                            i
+                                                        </span>
+                                                    </button>
+                                                </h2>
+                                                <div
+                                                    id={`recyclable-${item.id}`}
+                                                    className="accordion-collapse collapse"
+                                                    data-bs-parent={`#accordion-${item.id}`}
+                                                >
+                                                    <div className="accordion-body">
+                                                        {item.result.recyclability}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="col-md-6 col-lg-3">
-                                                <p className="fw-bold mb-1">Community</p>
-                                                <p>{item.result.communityImpact || "N/A"}</p>
+
+                                            {/* Community Impact */}
+                                            <div className="accordion-item">
+                                                <h2 className="accordion-header">
+                                                    <button
+                                                        className="accordion-button collapsed"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target={`#community-${item.id}`}
+                                                    >
+                                                        Community Impact
+                                                        <span
+                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                                            style={{
+                                                                width: "18px",
+                                                                height: "18px",
+                                                                fontSize: "11px",
+                                                                cursor: "help",
+                                                            }}
+                                                            title="Assesses the product's effect on local communities, including labor practices and social responsibility."
+                                                        >
+                                                            i
+                                                        </span>
+                                                    </button>
+                                                </h2>
+                                                <div
+                                                    id={`community-${item.id}`}
+                                                    className="accordion-collapse collapse"
+                                                    data-bs-parent={`#accordion-${item.id}`}
+                                                >
+                                                    <div className="accordion-body">
+                                                        {item.result.communityImpact || "N/A"}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="col-md-6 col-lg-3">
-                                                <p className="fw-bold mb-1">Drop-off</p>
-                                                <p>{item.result.dropOffInfo || "N/A"}</p>
+
+                                            {/* Drop-off Info */}
+                                            <div className="accordion-item">
+                                                <h2 className="accordion-header">
+                                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#dropoff-${item.id}`}>
+                                                        Drop-off Locations
+                                                        <span
+                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                                            style={{
+                                                                width: "18px",
+                                                                height: "18px",
+                                                                fontSize: "11px",
+                                                                cursor: "help",
+                                                            }}
+                                                            title="Provides nearby recycling centers and facilities where you can properly dispose of this item."
+                                                        >
+                                                            i
+                                                        </span>
+                                                    </button>
+                                                </h2>
+                                                <div
+                                                    id={`dropoff-${item.id}`}
+                                                    className="accordion-collapse collapse"
+                                                    data-bs-parent={`#accordion-${item.id}`}
+                                                >
+                                                    <div className="accordion-body">
+                                                        {item.result.dropOffInfo || "N/A"}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
+
+                                        {/* Reuse Ideas */}
+                                        {item.result.reuseIdeas && item.result.reuseIdeas.length > 0 && (
+                                            <div className="mt-4">
+                                                <div className="d-flex align-items-center mb-3">
+                                                    <h5 className="fw-bold mb-0">Ways to Reuse This Product</h5>
+                                                    <span
+                                                        className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
+                                                        style={{
+                                                            width: "18px",
+                                                            height: "18px",
+                                                            fontSize: "11px",
+                                                            cursor: "help",
+                                                        }}
+                                                        title="Creative ways to repurpose and extend the life of this product before recycling or disposal."
+                                                    >
+                                                        i
+                                                    </span>
+                                                </div>
+                                                <ul className="list-group">
+                                                    {item.result.reuseIdeas.map((idea, idx) => (
+                                                        <li key={idx} className="list-group-item">
+                                                            {idea}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -282,8 +406,8 @@ const Scanner = () => {
                                 >
                                     <div
                                         className={`d-inline-block p-3 rounded-3 ${msg.role === "user"
-                                            ? "bg-light border"
-                                            : "bg-body-secondary border"
+                                                ? "bg-light border"
+                                                : "bg-body-secondary border"
                                             }`}
                                         style={{ maxWidth: "80%" }}
                                     >
@@ -307,14 +431,8 @@ const Scanner = () => {
 
                 {/* Image Preview (Before Analysis) */}
                 {preview && !analyzedImages.find((img) => img.preview === preview) && (
-                    <div
-                        className="position-relative text-left mt-4"
-                        style={{ maxWidth: "250px", margin: "0" }}
-                    >
-                        <img
-                            src={preview}
-                            alt="Uploaded preview"
-                            className="img-thumbnail mb-2"
+                    <div className="position-relative text-left mt-4" style={{ maxWidth: "250px", margin: "0" }}>
+                        <img src={preview} alt="Uploaded preview" className="img-thumbnail mb-2"
                             style={{
                                 width: "100%",
                                 height: "auto",
@@ -322,14 +440,11 @@ const Scanner = () => {
                                 borderRadius: "10px",
                             }}
                         />
-
                         <div className="text-secondary small">
                             <p className="mb-1">{file?.name}</p>
                             <p>{(file?.size / 1024).toFixed(2)} KB</p>
                         </div>
-
-                        <button
-                            className="btn btn-outline-danger btn-sm mt-2"
+                        <button className="btn btn-outline-danger btn-sm mt-2"
                             onClick={() => {
                                 setFile(null);
                                 setPreview(null);
@@ -346,8 +461,7 @@ const Scanner = () => {
             {/* Fixed Input Bar at Bottom */}
             <div>
                 <div className="container py-3">
-                    <form
-                        className="d-flex align-items-center border rounded-3 p-2 bg-white"
+                    <form className="d-flex align-items-center border rounded-3 p-2 bg-white"
                         onSubmit={(e) => {
                             e.preventDefault();
 
@@ -360,9 +474,7 @@ const Scanner = () => {
                             }
                         }}
                     >
-                        <input
-                            type="text"
-                            className="form-control border-0 shadow-none"
+                        <input type="text" className="form-control border-0 shadow-none"
                             placeholder={
                                 !file && analyzedImages.length === 0
                                     ? "Upload a product image and optionally ask a question..."
@@ -375,25 +487,12 @@ const Scanner = () => {
                             onChange={(e) => setInputText(e.target.value)}
                         />
 
-                        <label
-                            htmlFor="file-input"
-                            className="btn btn-outline-secondary ms-2"
-                        >
+                        <label htmlFor="file-input" className="btn btn-outline-secondary ms-2">
                             +
-                            <input
-                                type="file"
-                                accept="image/*"
-                                id="file-input"
-                                className="d-none"
-                                onChange={handleFileChange}
-                            />
+                            <input type="file" accept="image/*" id="file-input" className="d-none" onChange={handleFileChange}/>
                         </label>
 
-                        <button
-                            type="submit"
-                            className="btn btn-outline-secondary ms-2"
-                            disabled={loading || chatLoading}
-                        >
+                        <button type="submit" className="btn btn-outline-secondary ms-2" disabled={loading || chatLoading}>
                             {loading || chatLoading ? "..." : "→"}
                         </button>
                     </form>
