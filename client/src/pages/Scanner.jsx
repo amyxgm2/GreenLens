@@ -10,7 +10,7 @@ const Scanner = () => {
     const [preview, setPreview] = useState(null); // Stores Base64 preview of uploaded img
 
     // Chatbox
-    const [messages, setMessages] = useState([]); // Chat hisroryu
+    const [messages, setMessages] = useState([]); // Chat history
     const [inputText, setInputText] = useState(""); // Current user input txt
     const [chatLoading, setChatLoading] = useState(false); // Loading for chat
 
@@ -23,7 +23,7 @@ const Scanner = () => {
 
     // Handles file selection
     // Generate preview thumbnail
-    // Reset erroor state
+    // Reset error state
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
         setFile(selectedFile || null);
@@ -171,24 +171,6 @@ const Scanner = () => {
                         <h4 className="fw-normal">
                             Upload a product photo to analyze its eco impact, recyclability, and reuse potential.
                         </h4>
-
-                        {/* <div className="row justify-content-center g-3 mt-4">
-                            {[
-                                "How can I reuse this?",
-                                "Summarize the image",
-                                "What does the sustainability score mean?",
-                                "How can I make an impact?",
-                            ].map((text, index) => (
-                                <div key={index} className="col-md-2 d-flex">
-                                    <div
-                                        className="card flex-fill d-flex align-items-center justify-content-center p-3 shadow-sm"
-                                        style={{ height: "120px" }}
-                                    >
-                                        {text}
-                                    </div>
-                                </div>
-                            ))}
-                        </div> */}
                     </div>
                 )}
 
@@ -244,24 +226,115 @@ const Scanner = () => {
                                             {item.result.greenScore}
                                         </h1>
                                         <p className="text-secondary">{item.result.summary}</p>
-                                        <div className="row text-center mt-3">
-                                            <div className="col-md-6 col-lg-3">
-                                                <p className="fw-bold mb-1">Energy Use</p>
-                                                <p>{item.result.energyUse}</p>
+
+                                        {/* Accordion for Details */}
+                                        <div className="accordion mt-3" id={`accordion-${item.id}`}>
+                                            {/* Energy Use */}
+                                            <div className="accordion-item">
+                                                <h2 className="accordion-header">
+                                                    <button
+                                                        className="accordion-button collapsed"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target={`#energy-${item.id}`}
+                                                    >
+                                                        Energy Use
+                                                    </button>
+                                                </h2>
+                                                <div
+                                                    id={`energy-${item.id}`}
+                                                    className="accordion-collapse collapse"
+                                                    data-bs-parent={`#accordion-${item.id}`}
+                                                >
+                                                    <div className="accordion-body">
+                                                        {item.result.energyUse}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="col-md-6 col-lg-3">
-                                                <p className="fw-bold mb-1">Recyclable</p>
-                                                <p>{item.result.recyclability}</p>
+
+                                            {/* Recyclable */}
+                                            <div className="accordion-item">
+                                                <h2 className="accordion-header">
+                                                    <button
+                                                        className="accordion-button collapsed"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target={`#recyclable-${item.id}`}
+                                                    >
+                                                        Recyclable
+                                                    </button>
+                                                </h2>
+                                                <div
+                                                    id={`recyclable-${item.id}`}
+                                                    className="accordion-collapse collapse"
+                                                    data-bs-parent={`#accordion-${item.id}`}
+                                                >
+                                                    <div className="accordion-body">
+                                                        {item.result.recyclability}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="col-md-6 col-lg-3">
-                                                <p className="fw-bold mb-1">Community</p>
-                                                <p>{item.result.communityImpact || "N/A"}</p>
+
+                                            {/* Community Impact */}
+                                            <div className="accordion-item">
+                                                <h2 className="accordion-header">
+                                                    <button
+                                                        className="accordion-button collapsed"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target={`#community-${item.id}`}
+                                                    >
+                                                        Community Impact
+                                                    </button>
+                                                </h2>
+                                                <div
+                                                    id={`community-${item.id}`}
+                                                    className="accordion-collapse collapse"
+                                                    data-bs-parent={`#accordion-${item.id}`}
+                                                >
+                                                    <div className="accordion-body">
+                                                        {item.result.communityImpact || "N/A"}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="col-md-6 col-lg-3">
-                                                <p className="fw-bold mb-1">Drop-off</p>
-                                                <p>{item.result.dropOffInfo || "N/A"}</p>
+
+                                            {/* Drop-off Info */}
+                                            <div className="accordion-item">
+                                                <h2 className="accordion-header">
+                                                    <button
+                                                        className="accordion-button collapsed"
+                                                        type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target={`#dropoff-${item.id}`}
+                                                    >
+                                                        Drop-off Locations
+                                                    </button>
+                                                </h2>
+                                                <div
+                                                    id={`dropoff-${item.id}`}
+                                                    className="accordion-collapse collapse"
+                                                    data-bs-parent={`#accordion-${item.id}`}
+                                                >
+                                                    <div className="accordion-body">
+                                                        {item.result.dropOffInfo || "N/A"}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
+
+                                        {/* Reuse Ideas */}
+                                        {item.result.reuseIdeas && item.result.reuseIdeas.length > 0 && (
+                                            <div className="mt-4">
+                                                <h5 className="fw-bold mb-3">Ways to Reuse This Product</h5>
+                                                <ul className="list-group">
+                                                    {item.result.reuseIdeas.map((idea, idx) => (
+                                                        <li key={idx} className="list-group-item">
+                                                            {idea}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

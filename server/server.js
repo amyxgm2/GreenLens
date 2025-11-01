@@ -71,18 +71,30 @@ app.post("/api/analyze", upload.single("file"), async (req, res) => {
 
     // First: Always generate the JSON analysis for the display card
     const analysisPrompt = `
-You are an environmental AI that analyzes product images for sustainability.
-Return ONLY pure JSON in this format:
-{
-  "greenScore": number (0-100),
-  "energyUse": "One concise sentence describing energy or production impact.",
-  "recyclability": "High|Medium|Low",
-  "communityImpact": "One short sentence on how reusing or donating this item helps the local community.",
-  "dropOffInfo": "Where to properly dispose or donate this product.",
-  "summary": "One short sentence summarizing overall sustainability."
-}
-Keep it concise, realistic, and JSON-only (no extra text).
-    `;
+      You are an environmental AI that analyzes product images for sustainability.
+      Return ONLY pure JSON in this format:
+      {
+        "greenScore": number (0-100),
+        "energyUse": "One concise sentence describing energy or production impact.",
+        "recyclability": "High|Medium|Low",
+        "communityImpact": "One short sentence on how reusing or donating this item helps the local community.",
+        "dropOffInfo": "Where to properly dispose or donate this product.",
+        "summary": "One short sentence summarizing overall sustainability.",
+        "reuseIdeas": [
+          "Creative reuse idea 1",
+          "Creative reuse idea 2",
+          "Creative reuse idea 3",
+          "Creative reuse idea 4",
+          "Creative reuse idea 5"
+        ]
+      }
+      
+      For reuseIdeas, provide 5 creative, practical, and specific ways to reuse or repurpose this product. 
+      Make them actionable and realistic for everyday people. Think DIY projects, alternative uses, 
+      donation options, or creative transformations.
+      
+      Keep it concise, realistic, and JSON-only (no extra text).
+          `;
 
     const analysisContents = [
       {
@@ -155,7 +167,7 @@ Respond in a conversational, empathetic tone (max 5 sentences). Answer their spe
     console.log(`✅ Analysis complete (Total scans: ${analyzedScans.length})`);
 
     res.json({
-      analysis: jsonAnalysis,  // JSON data for the display card
+      analysis: jsonAnalysis,  // JSON data for the display card (includes reuseIdeas)
       answer: conversationalAnswer  // Conversational answer for chat
     });
   } catch (err) {
@@ -192,6 +204,7 @@ app.post("/api/chat", async (req, res) => {
       summary: scan.summary,
       communityImpact: scan.communityImpact,
       dropOffInfo: scan.dropOffInfo,
+      reuseIdeas: scan.reuseIdeas,
     }));
 
     const prompt = `
@@ -207,6 +220,7 @@ Product ${idx + 1} (${scan.filename}):
 - Recyclability: ${scan.recyclability}
 - Community Impact: ${scan.communityImpact}
 - Drop-off Info: ${scan.dropOffInfo}
+- Reuse Ideas: ${scan.reuseIdeas ? scan.reuseIdeas.join(', ') : 'N/A'}
 `).join('\n')}
 
 User asked: "${userMessage}"
