@@ -21,14 +21,14 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-// CHANGED: Store multiple scans instead of just one
+// Store multiple scans instead of just one
 let analyzedScans = [];
 const MAX_SCANS = 10; // Keep last 10 images
 
 const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
-    {auth: {persistSession: false}}
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  { auth: { persistSession: false } }
 );
 
 const USERS = "user_info";
@@ -67,8 +67,10 @@ app.post("/api/analyze", upload.single("file"), async (req, res) => {
 
     const base64 = req.file.buffer.toString("base64");
     const mimeType = req.file.mimetype || "image/jpeg";
+    const userQuestion = req.body.userQuestion || ""; // Get user's question
 
-    const prompt = `
+    // First: Always generate the JSON analysis for the display card
+    const analysisPrompt = `
 You are an environmental AI that analyzes product images for sustainability.
 Return ONLY pure JSON in this format:
 {
@@ -77,30 +79,24 @@ Return ONLY pure JSON in this format:
   "recyclability": "High|Medium|Low",
   "communityImpact": "One short sentence on how reusing or donating this item helps the local community.",
   "dropOffInfo": "Where to properly dispose or donate this product.",
-  "reuseIdeas": [
-    {
-      "idea": "Short reuse idea (e.g., turn into a planter)",
-      "imageLink": "Direct link to a working image on Unsplash or Pexels"
-    }
-  ],
   "summary": "One short sentence summarizing overall sustainability."
 }
 Keep it concise, realistic, and JSON-only (no extra text).
     `;
 
-    const contents = [
+    const analysisContents = [
       {
         inlineData: {
           mimeType,
           data: base64,
         },
       },
-      { text: prompt },
+      { text: analysisPrompt },
     ];
 
-    const response = await safeGenerateContent("gemini-2.0-flash", contents);
+    const analysisResponse = await safeGenerateContent("gemini-2.0-flash", analysisContents);
 
-    let responseText = response.text?.trim() || "";
+    let responseText = analysisResponse.text?.trim() || "";
     if (responseText.startsWith("```")) {
       responseText = responseText
         .replace(/^```json\s*/i, "")
@@ -108,47 +104,60 @@ Keep it concise, realistic, and JSON-only (no extra text).
         .trim();
     }
 
-    let jsonResponse;
+    let jsonAnalysis;
     try {
-      jsonResponse = JSON.parse(responseText);
+      jsonAnalysis = JSON.parse(responseText);
     } catch {
       console.error("❌ Failed to parse JSON, returning raw text");
-      jsonResponse = { raw: responseText };
+      jsonAnalysis = { raw: responseText };
     }
 
-    // Replace invalid or missing image links
-    if (jsonResponse.reuseIdeas) {
-      const validImages = [
-        "https://images.unsplash.com/photo-1602526432604-b0e6b31e38f5?auto=format&fit=crop&w=800&q=80", // recycle station
-        "https://images.unsplash.com/photo-1556761175-129418cb2dfe?auto=format&fit=crop&w=800&q=80", // DIY crafts
-        "https://images.unsplash.com/photo-1524593163327-3ceee6d8e6b2?auto=format&fit=crop&w=800&q=80", // upcycled home decor
-        "https://images.unsplash.com/photo-1616627971660-78b9d8d173cd?auto=format&fit=crop&w=800&q=80", // planters
-      ];
-      jsonResponse.reuseIdeas = jsonResponse.reuseIdeas.map((idea) => ({
-        ...idea,
-        imageLink:
-          idea.imageLink && idea.imageLink.startsWith("http")
-            ? idea.imageLink
-            : validImages[Math.floor(Math.random() * validImages.length)],
-      }));
-    }
-
-    // CHANGED: Store scan with timestamp and filename
+    // Store scan with timestamp and filename
     const scanData = {
-      ...jsonResponse,
+      ...jsonAnalysis,
       timestamp: new Date().toISOString(),
       filename: req.file.originalname || "unknown",
     };
-    
+
     analyzedScans.push(scanData);
-    
+
     // Keep only last MAX_SCANS images
     if (analyzedScans.length > MAX_SCANS) {
       analyzedScans.shift();
     }
 
-    console.log(`✅ AI Response (Total scans: ${analyzedScans.length}):`, jsonResponse);
-    res.json(jsonResponse);
+    // Second: Generate conversational answer based on user's question
+    let conversationalAnswer;
+
+    if (userQuestion.trim()) {
+      // User asked a specific question
+      const questionPrompt = `
+You are GreenLens AI, a friendly sustainability coach 🌿.
+
+Based on this product analysis:
+${JSON.stringify(jsonAnalysis, null, 2)}
+
+The user asked: "${userQuestion}"
+
+Respond in a conversational, empathetic tone (max 5 sentences). Answer their specific question directly. Keep it helpful, realistic, and positive.
+`;
+
+      const questionResponse = await safeGenerateContent("gemini-2.0-flash", [
+        { text: questionPrompt },
+      ]);
+
+      conversationalAnswer = questionResponse.text?.trim() || "I've analyzed your product!";
+    } else {
+      // No question asked, give default summary
+      conversationalAnswer = `I've analyzed your product! Here's what I found:\n\nSustainability Score: ${jsonAnalysis.greenScore}/100\n\n${jsonAnalysis.summary}\n\nFeel free to ask me any questions about this product's environmental impact!`;
+    }
+
+    console.log(`✅ Analysis complete (Total scans: ${analyzedScans.length})`);
+
+    res.json({
+      analysis: jsonAnalysis,  // JSON data for the display card
+      answer: conversationalAnswer  // Conversational answer for chat
+    });
   } catch (err) {
     console.error("❌ Error analyzing image:", err);
     if (err.message?.includes("overloaded") || err.status === 503) {
@@ -165,15 +174,15 @@ Keep it concise, realistic, and JSON-only (no extra text).
 app.post("/api/chat", async (req, res) => {
   try {
     const { userMessage } = req.body;
-    
-    // CHANGED: Check if any scans exist
+
+    // Check if any scans exist
     if (analyzedScans.length === 0) {
       return res
         .status(400)
         .json({ error: "Please analyze an image first before chatting." });
     }
 
-    // CHANGED: Include ALL analyzed scans in the context
+    // Include ALL analyzed scans in the context
     const scansContext = analyzedScans.map((scan, idx) => ({
       imageNumber: idx + 1,
       filename: scan.filename,
@@ -219,68 +228,64 @@ Respond in a conversational, empathetic tone (max 5 sentences). If they ask abou
 });
 
 // ============ AUTH ROUTES ============
-app.post("/api/register", async(req,res) =>{
-    try{
-        const{ username, email, password, first_name, last_name}= req.body;
-        if(!username || !email || !password){
-            return res.status(400).json({error: "username, email, & password is required."});
-        }
-
-        //hash password
-        const hash = await bcrypt.hash(String(password), 12);
-
-        const { data, error } = await supabase
-        .from(USERS)
-        .insert({
-            username, 
-            email,
-            password: hash, 
-            first_name: first_name || null, 
-            last_name: last_name || null, 
-            status: "active",
-            created_at: new Date().toISOString()
-        })
-        .select(PUBLIC_USER)
-        .single();
-
-        if(error) return res.status(400).json({ error: error.message});
-        res.status(201).json({ user: data});
-    } catch (e){
-        console.error("REGISTER_ERR:", e);
-        res.status(500).json({error: "Registration failed"});
+app.post("/api/register", async (req, res) => {
+  try {
+    const { username, email, password, first_name, last_name } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: "username, email, & password is required." });
     }
+
+    const hash = await bcrypt.hash(String(password), 12);
+
+    const { data, error } = await supabase
+      .from(USERS)
+      .insert({
+        username,
+        email,
+        password: hash,
+        first_name: first_name || null,
+        last_name: last_name || null,
+        status: "active",
+        created_at: new Date().toISOString()
+      })
+      .select(PUBLIC_USER)
+      .single();
+
+    if (error) return res.status(400).json({ error: error.message });
+    res.status(201).json({ user: data });
+  } catch (e) {
+    console.error("REGISTER_ERR:", e);
+    res.status(500).json({ error: "Registration failed" });
+  }
 });
 
-app.post("/api/login", async (req,res) => {
-    try{
-        const { identifier, password } = req.body;
-        if(!identifier || !password){
-            return res.status(400).json({error: "username and password are required"});
-        }
-
-        const {data: user,error } = await supabase
-         .from(USERS)
-         .select(PRIVATE_USER)
-         .or(`email.eq.${identifier}, username.eq.${identifier}`)
-         .limit(1)
-         .single();
-
-        if (error || !user) return res.status(401).json({ error: "Invalid credentials"});
-
-        //compare hash
-        const ok = await bcrypt.compare(String(password), user.password || "");
-        if (!ok) return res.status(401).json({ error: "Invalid credentials"});
-
-        //update login timestamp
-        await supabase.from(USERS).update({ login_active: new Date().toISOString()}).eq("id", user.id);
-
-        //return public fields only 
-        const { password: _omit, ...publicUser } = user;
-        res.json({ user: publicUser });
-    } catch (e) {
-        console.error("LOGIN_ERR:", e);
-        res.status(500).json({ error: "Login failed" });
+app.post("/api/login", async (req, res) => {
+  try {
+    const { identifier, password } = req.body;
+    if (!identifier || !password) {
+      return res.status(400).json({ error: "username and password are required" });
     }
+
+    const { data: user, error } = await supabase
+      .from(USERS)
+      .select(PRIVATE_USER)
+      .or(`email.eq.${identifier}, username.eq.${identifier}`)
+      .limit(1)
+      .single();
+
+    if (error || !user) return res.status(401).json({ error: "Invalid credentials" });
+
+    const ok = await bcrypt.compare(String(password), user.password || "");
+    if (!ok) return res.status(401).json({ error: "Invalid credentials" });
+
+    await supabase.from(USERS).update({ login_active: new Date().toISOString() }).eq("id", user.id);
+
+    const { password: _omit, ...publicUser } = user;
+    res.json({ user: publicUser });
+  } catch (e) {
+    console.error("LOGIN_ERR:", e);
+    res.status(500).json({ error: "Login failed" });
+  }
 });
 
 app.post("/api/logout", async (req, res) => {
