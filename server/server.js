@@ -72,29 +72,61 @@ app.post("/api/analyze", upload.single("file"), async (req, res) => {
     // First: Always generate the JSON analysis for the display card
     const analysisPrompt = `
       You are an environmental AI that analyzes product images for sustainability.
-      Return ONLY pure JSON in this format:
+
+      CRITICAL INSTRUCTIONS:
+      1. Carefully examine the ENTIRE image, including the physical object itself, not just what's printed on it
+      2. Focus on analyzing the PHYSICAL PRODUCT (the material, packaging, container, or item), NOT the content, text, or graphics on it
+      3. Examples:
+        - A thank you card → Analyze the CARD STOCK/PAPER MATERIAL, not the message
+        - A water bottle with a label → Analyze the BOTTLE MATERIAL, not the brand logo
+        - A cereal box → Analyze the CARDBOARD PACKAGING, not the cereal inside
+
+      WHEN TO REJECT AN IMAGE:
+      If the image shows ONLY digital content, scenery, animals, people, screenshots, or abstract art with NO physical product visible, return:
       {
-        "greenScore": number (0-100),
-        "energyUse": "One to three concise sentences describing energy or production impact.",
-        "recyclability": "High|Medium|Low",
-        "communityImpact": "One to three short sentences on how reusing or donating this item helps the local community.",
-        "dropOffInfo": "Where to properly dispose or donate this product.",
-        "summary": "One to three short sentences summarizing overall sustainability.",
+        "productName": "No physical product detected",
+        "summary": "I can only analyze physical products and their materials. This image appears to show [describe what you see]. Please upload a clear photo of the actual physical item (the material, packaging, or container) for sustainability analysis."
+      }
+
+      FOR VALID PRODUCT IMAGES, analyze the PHYSICAL MATERIAL and return ONLY pure JSON:
+      {
+        "productName": "Specific material description (e.g., 'Greeting Card - Printed Cardstock', 'Single-Use Plastic Water Bottle', 'Glossy Paper Magazine')",
+        "greenScore": number (0-100, evaluating the PHYSICAL MATERIAL's sustainability),
+        "energyUse": "1-3 sentences about the MATERIAL's manufacturing energy, production process, and carbon footprint",
+        "recyclability": "High|Medium|Low (based on the MATERIAL composition) and provide 1-2 percise summary on why.",
+        "communityImpact": "1-3 sentences on donation potential for this TYPE of item, community reuse programs, or local recycling options",
+        "dropOffInfo": "Specific disposal guidance for this MATERIAL: paper recycling, e-waste, donation centers, or proper waste stream",
+        "summary": "1-3 sentences covering the MATERIAL's overall environmental impact, best disposal method, and sustainability rating",
         "reuseIdeas": [
-          "Creative reuse idea 1",
-          "Creative reuse idea 2",
-          "Creative reuse idea 3",
-          "Creative reuse idea 4",
-          "Creative reuse idea 5"
+          "Specific, actionable reuse idea 1 for this physical item",
+          "Specific, actionable reuse idea 2",
+          "Specific, actionable reuse idea 3",
+          "Specific, actionable reuse idea 4",
+          "Specific, actionable reuse idea 5"
         ]
       }
-      
-      For reuseIdeas, provide 5 creative, practical, and specific ways to reuse or repurpose this product. 
-      Make them actionable and realistic for everyday people. Think DIY projects, alternative uses, 
-      donation options, or creative transformations.
-      
-      Keep it concise, realistic, and JSON-only (no extra text).
-          `;
+
+      SCORING GUIDELINES for greenScore (evaluate the PHYSICAL MATERIAL):
+      - 80-100: Highly sustainable (recyclable paper, reusable materials, minimal processing, biodegradable)
+      - 60-79: Moderately sustainable (recyclable with some processing, FSC-certified paper, moderate energy use)
+      - 40-59: Below average (mixed materials, coated paper, difficult to recycle, high energy production)
+      - 20-39: Poor sustainability (non-recyclable, single-use plastic, high environmental cost)
+      - 0-19: Very poor (toxic materials, extremely wasteful, significant pollution)
+
+      CRITICAL CONSISTENCY RULES:
+      - For greeting cards/postcards: Always identify as "Greeting Card" or "Postcard" with paper type (e.g., "Glossy Cardstock", "Matte Recycled Paper")
+      - Score paper products consistently: Plain paper (75-85), Glossy/coated paper (50-65), Recycled paper (80-90)
+      - Ignore decorative elements - focus ONLY on the base material
+      - Be consistent: The same type of material should always receive similar scores
+
+      PRODUCT NAME MUST specify:
+      - The item type (card, bottle, box, container)
+      - The material (cardstock, plastic, glass, metal, paper)
+      - Paper quality if relevant (glossy, matte, recycled, virgin)
+      - Examples: "Greeting Card - Glossy Cardstock", "Paperback Book - Recycled Paper", "Plastic Gift Card - PVC"
+
+      Return ONLY valid JSON with no markdown, no explanations, no extra text. Be consistent in your scoring.
+    `;
 
     const analysisContents = [
       {
@@ -196,7 +228,7 @@ app.post("/api/chat", async (req, res) => {
 
     // Include ALL analyzed scans in the context
     const scansContext = analyzedScans.map((scan, idx) => ({
-      imageNumber: idx + 1,
+      // imageNumber: idx + 1,
       filename: scan.filename,
       greenScore: scan.greenScore,
       energyUse: scan.energyUse,
@@ -225,7 +257,7 @@ Product ${idx + 1} (${scan.filename}):
 
 User asked: "${userMessage}"
 
-Respond in a conversational, empathetic tone (max 5 sentences). If they ask about a specific product, reference it by number or filename. Keep it helpful, realistic, and positive.
+Respond in a conversational, empathetic tone (max 5 sentences). If they ask about a specific product, reference it by filename. Keep it helpful, realistic, and positive.
 `;
 
     const chatResponse = await safeGenerateContent("gemini-2.0-flash", [

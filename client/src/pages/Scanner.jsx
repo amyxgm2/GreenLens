@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./Scanner.css";
 
 const Scanner = () => {
     const [file, setFile] = useState(null); // Current selected img file
@@ -35,6 +36,9 @@ const Scanner = () => {
         } else {
             setPreview(null);
         }
+
+        // Reset input value to allow re-uploading the same file
+        e.target.value = '';
     };
 
     const handleSubmit = async () => {
@@ -94,6 +98,12 @@ const Scanner = () => {
             setFile(null);
             setPreview(null);
             setInputText("");
+
+            // Reset file inputs to allow re-uploading the same file
+            const fileInputTop = document.getElementById('file-input');
+            const fileInputBottom = document.getElementById('file-input-bottom');
+            if (fileInputTop) fileInputTop.value = '';
+            if (fileInputBottom) fileInputBottom.value = '';
         } catch (err) {
             console.error(err);
             setError("Something went wrong while analyzing!");
@@ -161,12 +171,12 @@ const Scanner = () => {
 
     return (
         <>
-            <div className="container py-5" style={{ marginTop: "50px", minHeight: "calc(100vh - 200px)" }}>
+            <div className="container py-5 scanner-container">
                 {/* Header / Intro Section - Only show when no images uploaded */}
                 {analyzedImages.length === 0 && !file && (
-                    <div className="text-center mb-5" style={{ marginTop: "190px" }}>
+                    <div className="intro-section">
                         <h1 className="fw-bold">Welcome to GreenLens!</h1>
-                        <h4 className="fw-normal" style={{ marginTop: "60px" }}>
+                        <h4 className="fw-normal intro-subtitle">
                             Upload a product photo to analyze its eco impact, recyclability, and reuse potential.
                         </h4>
                     </div>
@@ -174,32 +184,48 @@ const Scanner = () => {
 
                 {/* Show input form ONLY when no images have been analyzed yet */}
                 {analyzedImages.length === 0 && (
-                    <form className="d-flex align-items-center border rounded-3 p-2 bg-white"
-                        onSubmit={(e) => {
-                            e.preventDefault();
+                    <>
+                        <form className="d-flex align-items-center border rounded-3 p-2 bg-white input-bar-shadow"
+                            onSubmit={(e) => {
+                                e.preventDefault();
 
-                            if (preview && !analyzedImages.find((img) => img.preview === preview)) {
-                                handleSubmit(); // Analyze image (with or without question)
-                            } else {
-                                setError("Please upload an image before submitting.");
-                            }
-                        }}
-                    >
-                        <input type="text" className="form-control border-0 shadow-none"
-                            placeholder="Upload a product image and optionally ask a question..."
-                            value={inputText}
-                            onChange={(e) => setInputText(e.target.value)}
-                        />
+                                if (preview) {
+                                    handleSubmit(); // Analyze image (with or without question)
+                                } else if (analyzedImages.length > 0 && inputText.trim()) {
+                                    handleSendMessage(e); // Chat about existing images
+                                } else {
+                                    setError("Please upload an image or enter a message.");
+                                }
+                            }}
+                        >
+                            <input type="text" className="form-control border-0 shadow-none" placeholder="Upload a product image" value={inputText} onChange={(e) => setInputText(e.target.value)} />
+                            <label htmlFor="file-input" className="btn btn-outline-secondary ms-2 img-input-btn">+
+                                <input type="file" accept="image/*" id="file-input" className="d-none" onChange={handleFileChange} />
+                            </label>
 
-                        <label htmlFor="file-input" className="btn btn-outline-secondary ms-2">
-                            +
-                            <input type="file" accept="image/*" id="file-input" className="d-none" onChange={handleFileChange} />
-                        </label>
+                            <button type="submit" className={`btn ms-2 submit-btn ${file || inputText.trim() ? 'submit-btn-active' : 'btn-outline-secondary'}`} disabled={loading || chatLoading}>
+                                {loading || chatLoading ? "..." : "→"}
+                            </button>
+                        </form>
 
-                        <button type="submit" className="btn btn-outline-secondary ms-2" disabled={loading || chatLoading}>
-                            {loading || chatLoading ? "..." : "→"}
-                        </button>
-                    </form>
+                        {/* Image Preview (Before First Analysis) */}
+                        {preview && (
+                            <div className="upload-preview mt-3">
+                                <img src={preview} alt="Uploaded preview" className="img-thumbnail preview-img mb-2" />
+                                <div className="text-secondary small">
+                                    <p className="mb-1">{file?.name}</p>
+                                    <p>{(file?.size / 1024).toFixed(2)} KB</p>
+                                </div>
+                                <button className="btn btn-outline-danger btn-sm mt-2"
+                                    onClick={() => {
+                                        setFile(null);
+                                        setPreview(null);
+                                    }}
+                                >Remove Image
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
 
                 {/* Analyzed Images History */}
@@ -207,43 +233,24 @@ const Scanner = () => {
                     <div className="mb-4">
                         <h4 className="fw-bold mb-3">Analyzed Products</h4>
                         {analyzedImages.map((item) => (
-                            <div key={item.id} className="card p-4 mb-3">
+                            <div key={item.id} className="card p-4 mb-3 analyzed-container">
                                 <div className="row align-items-start">
-                                    <div
-                                        className="col-md-5 text-center position-relative"
-                                        style={{ maxWidth: "300px" }}
-                                    >
-                                        <img
-                                            src={item.preview}
-                                            alt="Analyzed preview"
-                                            className="img-thumbnail"
-                                            style={{
-                                                width: "100%",
-                                                height: "auto",
-                                                objectFit: "cover",
-                                                borderRadius: "10px",
-                                            }}
-                                        />
+                                    {/* Image preview after submit */}
+                                    <div className="col-md-5 text-left position-relative image-preview-container">
+                                        <img src={item.preview} alt="Analyzed preview" className="img-thumbnail preview-img" />
                                         <div className="text-secondary small mt-2">
-                                            <p className="mb-1">{item.file?.name}</p>
+                                            <p className="mb-1">{item.result?.productName || item.file?.name}</p>
                                             <p>{(item.file?.size / 1024).toFixed(2)} KB</p>
                                         </div>
                                     </div>
 
+                                    {/* JSON data display */}
                                     <div className="col-md-9">
                                         <div className="d-flex align-items-center mb-3">
                                             <h4 className="fw-bold mb-0">Sustainability Score</h4>
-                                            <span
-                                                className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
-                                                style={{
-                                                    width: "20px",
-                                                    height: "20px",
-                                                    fontSize: "12px",
-                                                    cursor: "help",
-                                                }}
+                                            <span className="info-icon"
                                                 title="This score (0-100) evaluates the product's environmental impact based on energy use, recyclability, material sustainability, and community impact. Higher scores indicate more eco-friendly products."
-                                            >
-                                                i
+                                            >?
                                             </span>
                                         </div>
                                         <h1 className={`fw-bold ${getScoreColor(item.result.greenScore)}`}>
@@ -256,32 +263,12 @@ const Scanner = () => {
                                             {/* Energy Use */}
                                             <div className="accordion-item">
                                                 <h2 className="accordion-header">
-                                                    <button
-                                                        className="accordion-button collapsed"
-                                                        type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target={`#energy-${item.id}`}
-                                                    >
+                                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#energy-${item.id}`}>
                                                         Energy Use
-                                                        <span
-                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
-                                                            style={{
-                                                                width: "18px",
-                                                                height: "18px",
-                                                                fontSize: "11px",
-                                                                cursor: "help",
-                                                            }}
-                                                            title="Measures the carbon footprint and energy consumed during production, use, and disposal of the product."
-                                                        >
-                                                            i
-                                                        </span>
+                                                        <span className="accordion-info-icon" title="Measures the carbon footprint and energy consumed during production, use, and disposal of the product.">?</span>
                                                     </button>
                                                 </h2>
-                                                <div
-                                                    id={`energy-${item.id}`}
-                                                    className="accordion-collapse collapse"
-                                                    data-bs-parent={`#accordion-${item.id}`}
-                                                >
+                                                <div id={`energy-${item.id}`} className="accordion-collapse collapse" data-bs-parent={`#accordion-${item.id}`}>
                                                     <div className="accordion-body">
                                                         {item.result.energyUse}
                                                     </div>
@@ -291,32 +278,12 @@ const Scanner = () => {
                                             {/* Recyclable */}
                                             <div className="accordion-item">
                                                 <h2 className="accordion-header">
-                                                    <button
-                                                        className="accordion-button collapsed"
-                                                        type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target={`#recyclable-${item.id}`}
-                                                    >
+                                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#recyclable-${item.id}`}>
                                                         Recyclable
-                                                        <span
-                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
-                                                            style={{
-                                                                width: "18px",
-                                                                height: "18px",
-                                                                fontSize: "11px",
-                                                                cursor: "help",
-                                                            }}
-                                                            title="Evaluates whether materials can be recycled and how easily they can be processed at recycling facilities."
-                                                        >
-                                                            i
-                                                        </span>
+                                                        <span className="accordion-info-icon" title="Evaluates whether materials can be recycled and how easily they can be processed at recycling facilities.">?</span>
                                                     </button>
                                                 </h2>
-                                                <div
-                                                    id={`recyclable-${item.id}`}
-                                                    className="accordion-collapse collapse"
-                                                    data-bs-parent={`#accordion-${item.id}`}
-                                                >
+                                                <div id={`recyclable-${item.id}`} className="accordion-collapse collapse" data-bs-parent={`#accordion-${item.id}`}>
                                                     <div className="accordion-body">
                                                         {item.result.recyclability}
                                                     </div>
@@ -326,32 +293,12 @@ const Scanner = () => {
                                             {/* Community Impact */}
                                             <div className="accordion-item">
                                                 <h2 className="accordion-header">
-                                                    <button
-                                                        className="accordion-button collapsed"
-                                                        type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target={`#community-${item.id}`}
-                                                    >
+                                                    <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#community-${item.id}`}>
                                                         Community Impact
-                                                        <span
-                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
-                                                            style={{
-                                                                width: "18px",
-                                                                height: "18px",
-                                                                fontSize: "11px",
-                                                                cursor: "help",
-                                                            }}
-                                                            title="Assesses the product's effect on local communities, including labor practices and social responsibility."
-                                                        >
-                                                            i
-                                                        </span>
+                                                        <span className="accordion-info-icon" title="Assesses the product's effect on local communities, including labor practices and social responsibility.">?</span>
                                                     </button>
                                                 </h2>
-                                                <div
-                                                    id={`community-${item.id}`}
-                                                    className="accordion-collapse collapse"
-                                                    data-bs-parent={`#accordion-${item.id}`}
-                                                >
+                                                <div id={`community-${item.id}`} className="accordion-collapse collapse" data-bs-parent={`#accordion-${item.id}`}>
                                                     <div className="accordion-body">
                                                         {item.result.communityImpact || "N/A"}
                                                     </div>
@@ -363,25 +310,10 @@ const Scanner = () => {
                                                 <h2 className="accordion-header">
                                                     <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={`#dropoff-${item.id}`}>
                                                         Drop-off Locations
-                                                        <span
-                                                            className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
-                                                            style={{
-                                                                width: "18px",
-                                                                height: "18px",
-                                                                fontSize: "11px",
-                                                                cursor: "help",
-                                                            }}
-                                                            title="Provides nearby recycling centers and facilities where you can properly dispose of this item."
-                                                        >
-                                                            i
-                                                        </span>
+                                                        <span className="accordion-info-icon" title="Provides nearby recycling centers and facilities where you can properly dispose of this item.">?</span>
                                                     </button>
                                                 </h2>
-                                                <div
-                                                    id={`dropoff-${item.id}`}
-                                                    className="accordion-collapse collapse"
-                                                    data-bs-parent={`#accordion-${item.id}`}
-                                                >
+                                                <div id={`dropoff-${item.id}`} className="accordion-collapse collapse" data-bs-parent={`#accordion-${item.id}`}>
                                                     <div className="accordion-body">
                                                         {item.result.dropOffInfo || "N/A"}
                                                     </div>
@@ -394,22 +326,10 @@ const Scanner = () => {
                                             <div className="mt-4">
                                                 <div className="d-flex align-items-center mb-3">
                                                     <h5 className="fw-bold mb-0">Ways to Reuse This Product</h5>
-                                                    <span
-                                                        className="ms-2 d-inline-flex align-items-center justify-content-center rounded-circle bg-light border"
-                                                        style={{
-                                                            width: "18px",
-                                                            height: "18px",
-                                                            fontSize: "11px",
-                                                            cursor: "help",
-                                                        }}
-                                                        title="Creative ways to repurpose and extend the life of this product before recycling or disposal."
-                                                    >
-                                                        i
-                                                    </span>
                                                 </div>
                                                 <ul className="list-group">
                                                     {item.result.reuseIdeas.map((idea, idx) => (
-                                                        <li key={idx} className="list-group-item">
+                                                        <li key={idx} className="list-group-item reuse-data">
                                                             {idea}
                                                         </li>
                                                     ))}
@@ -427,20 +347,10 @@ const Scanner = () => {
                 {messages.length > 0 && (
                     <div className="mb-4">
                         <h4 className="fw-bold mb-3">Conversation</h4>
-                        <div className="card p-3" style={{ backgroundColor: "#f8f9fa" }}>
+                        <div className="chat-container">
                             {messages.map((msg, i) => (
-                                <div
-                                    key={i}
-                                    className={`mb-3 ${msg.role === "user" ? "text-end" : "text-start"
-                                        }`}
-                                >
-                                    <div
-                                        className={`d-inline-block p-3 rounded-3 ${msg.role === "user"
-                                            ? "bg-light border"
-                                            : "bg-body-secondary border"
-                                            }`}
-                                        style={{ maxWidth: "80%" }}
-                                    >
+                                <div key={i} className={`mb-3 ${msg.role === "user" ? "text-end" : "text-start"}`}>
+                                    <div className={`chat-message ${msg.role === "user" ? "user-message" : "ai-message"}`}>
                                         {msg.content}
                                     </div>
                                 </div>
@@ -456,82 +366,64 @@ const Scanner = () => {
                             )}
                             <div ref={chatEndRef} />
                         </div>
-                    </div>
-                )}
 
-                {/* Image Preview (Before Analysis) */}
-                {preview && !analyzedImages.find((img) => img.preview === preview) && (
-                    <div className="position-relative text-left mt-4" style={{ maxWidth: "250px", margin: "0" }}>
-                        <img src={preview} alt="Uploaded preview" className="img-thumbnail mb-2"
-                            style={{
-                                width: "100%",
-                                height: "auto",
-                                objectFit: "cover",
-                                borderRadius: "10px",
-                            }}
-                        />
-                        <div className="text-secondary small">
-                            <p className="mb-1">{file?.name}</p>
-                            <p>{(file?.size / 1024).toFixed(2)} KB</p>
+                        {/* Image Preview (Before Analysis) - Show above input when there's a new image */}
+                        {preview && (
+                            <div className="upload-preview mt-3">
+                                <img src={preview} alt="Uploaded preview" className="img-thumbnail preview-img mb-2" />
+                                <div className="text-secondary small">
+                                    <p className="mb-1">{file?.name}</p>
+                                    <p>{(file?.size / 1024).toFixed(2)} KB</p>
+                                </div>
+                                <button className="btn btn-outline-danger btn-sm mt-2"
+                                    onClick={() => {
+                                        setFile(null);
+                                        setPreview(null);
+                                    }}
+                                >Remove Image
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Input Bar - integrated within conversation */}
+                        <div className="mt-3">
+                            <form className="d-flex align-items-center border rounded-3 p-2 bg-white input-bar-shadow"
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+
+                                    if (preview) {
+                                        handleSubmit(); // Analyze image (with or without question)
+                                    } else if (analyzedImages.length > 0 && inputText.trim()) {
+                                        handleSendMessage(e); // Chat about existing images
+                                    } else {
+                                        setError("Please upload an image or enter a message.");
+                                    }
+                                }}
+                            >
+                                <input type="text" className="form-control border-0"
+                                    placeholder={
+                                        preview && !analyzedImages.find((img) => img.preview === preview)
+                                            ? "Ask a question about this image (optional)..."
+                                            : "Ask about your products' sustainability..."
+                                    }
+                                    value={inputText}
+                                    onChange={(e) => setInputText(e.target.value)}
+                                />
+
+                                <label htmlFor="file-input-bottom" className="btn btn-outline-secondary ms-2 img-input-btn">+
+                                    <input type="file" accept="image/*" id="file-input-bottom" className="d-none" onChange={handleFileChange} />
+                                </label>
+
+                                <button type="submit" className={`btn ms-2 submit-btn ${file || inputText.trim() ? 'submit-btn-active' : 'btn-outline-secondary'}`} disabled={loading || chatLoading}>
+                                    {loading || chatLoading ? "..." : "→"}
+                                </button>
+                            </form>
                         </div>
-                        <button className="btn btn-outline-danger btn-sm mt-2"
-                            onClick={() => {
-                                setFile(null);
-                                setPreview(null);
-                            }}
-                        >
-                            Remove Image
-                        </button>
                     </div>
                 )}
 
                 {error && <p className="text-danger mt-3">{error}</p>}
             </div>
-
-            {/* Fixed Input Bar at Bottom - Only show AFTER images have been analyzed */}
-            {analyzedImages.length > 0 && (
-                <div style={{
-                    backgroundColor: "white",
-                    borderTop: "1px solid #dee2e6",
-                    paddingTop: "20px",
-                    paddingBottom: "20px"
-                }}>
-                    <div className="container">
-                        <form className="d-flex align-items-center border rounded-3 p-2 bg-white"
-                            onSubmit={(e) => {
-                                e.preventDefault();
-
-                                if (preview && !analyzedImages.find((img) => img.preview === preview)) {
-                                    handleSubmit(); // Analyze image (with or without question)
-                                } else if (analyzedImages.length > 0) {
-                                    handleSendMessage(e); // Chat about existing images
-                                } else {
-                                    setError("Please upload an image before submitting.");
-                                }
-                            }}
-                        >
-                            <input type="text" className="form-control border-0 shadow-none"
-                                placeholder={
-                                    preview && !analyzedImages.find((img) => img.preview === preview)
-                                        ? "Ask a question about this image (optional)..."
-                                        : "Ask about your products' sustainability..."
-                                }
-                                value={inputText}
-                                onChange={(e) => setInputText(e.target.value)}
-                            />
-
-                            <label htmlFor="file-input-bottom" className="btn btn-outline-secondary ms-2">
-                                +
-                                <input type="file" accept="image/*" id="file-input-bottom" className="d-none" onChange={handleFileChange} />
-                            </label>
-
-                            <button type="submit" className="btn btn-outline-secondary ms-2" disabled={loading || chatLoading}>
-                                {loading || chatLoading ? "..." : "→"}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
         </>
     );
 };
