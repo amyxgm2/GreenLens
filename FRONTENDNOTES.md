@@ -8,3 +8,6 @@ App Reference
 
 File Upload:
 - https://uploadcare.com/blog/how-to-upload-file-in-react/
+
+Accordion:
+- https://getbootstrap.com/docs/5.0/components/accordion/
