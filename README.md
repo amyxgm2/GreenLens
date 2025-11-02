@@ -1,4 +1,4 @@
-# 🌿 GreenLens: Scan Smarter, Shop Greener
+# 🌿 GreenLens: Make choices that protect our planet
 
 **GreenLens** is a web app that lets users **upload a product photo** or **enter its name**, then uses **AI to rate its sustainability** — from energy use to ethical impact.
 
@@ -35,7 +35,7 @@ GreenLens helps consumers make **informed, eco-friendly decisions effortlessly**
 | **G – Green Energy** | AI shows estimated **energy used in production** and **emissions from transportation**. |
 | **R – Reduce Waste** | Suggests ways to **reuse, recycle, or upcycle** the product. |
 | **E – Ethical AI** | AI provides **transparent explanations** for its sustainability reasoning. |
-| **E – Environment & Ecosystems** | Highlights impact on **wildlife, water, or forests** (e.g., “Palm oil → deforestation risk”). |
+| **E – Environment & Ecosystems** | Highlights impact on **wildlife, water, or forests**. |
 | **N – Novelty** | Generates an **AI-powered “GreenScore” (1–100)** with **color-coded feedback** for eco-friendly habits. |
 
 ---
@@ -95,12 +95,12 @@ GreenLens helps consumers make **informed, eco-friendly decisions effortlessly**
 - Added client-side validation and custom error messaging.
 - Only **username + password** supported for login.
 
-### **Scanner Page**
+### **Analyzer Page**
 - Designed for intuitive use — upload a photo or type product name.
 - Displays GreenScore and detailed sustainability insights.
 
 ### **Database Integration**
-- Stores user and scan data securely.
+- Stores user data securely.
 - Enables persistent tracking of user activity (future update).
 
 ### **Form Validation**
