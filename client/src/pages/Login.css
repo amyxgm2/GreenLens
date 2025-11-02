@@ -26,20 +26,33 @@
   margin-bottom: 1rem;
 }
 
-/* ====== INPUTS (FIXED FLOATING LABEL STYLE) ====== */
+/* ====== INPUT GROUP ====== */
 .form-floating {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
   margin-bottom: 1.5rem;
 }
 
-/* Input styling */
+/* ====== LABEL (STATIC ABOVE INPUT) ====== */
+.form-floating label {
+  font-size: 0.9rem;
+  color: #1E9E1A;
+  margin-bottom: 0.35rem; /* ensures spacing */
+  padding-left: 0.25rem;
+  background-color: transparent;
+}
+
+/* ====== INPUT ====== */
 .form-floating input {
   width: 100%;
   border: 1px solid #ced4da;
   border-radius: 0.5rem;
-  padding: 1rem 0.75rem;
+  padding: 0.8rem 0.75rem;
   font-size: 1rem;
-  background-color: transparent;
+  background-color: #fff;
   transition: border-color 0.3s ease;
   box-sizing: border-box;
 }
@@ -50,22 +63,28 @@
   border-color: #1E9E1A;
 }
 
-/* Label styling — moved fully above */
-.form-floating label {
-  position: absolute;
-  top: -0.8rem;  /* moves above input */
-  left: 0.75rem;
-  font-size: 0.8rem;
-  color: #1E9E1A;
-  background-color: #fff;
-  padding: 0 0.3rem;
-  pointer-events: none;
-  transition: all 0.2s ease;
+/* Hide placeholder so it doesn’t interfere */
+.form-floating input::placeholder {
+  color: transparent;
 }
 
-/* Remove floating label transitions completely (static style) */
-.form-floating input::placeholder {
-  color: transparent; /* hide placeholder since label replaces it */
+/* ====== ERROR STYLING ====== */
+.input-error {
+  border-color: red !important;
+  box-shadow: 0 0 4px rgba(255, 0, 0, 0.3);
+}
+
+.input-error + label {
+  color: red;
+}
+
+/* ====== ERROR TEXT ====== */
+.error-text {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+  animation: fadeIn 0.2s ease-in;
 }
 
 /* ====== BUTTON ====== */
@@ -103,6 +122,19 @@
   text-decoration: underline;
 }
 
+/* ====== FEEDBACK MESSAGE ====== */
+.form-message {
+  margin-bottom: 1rem;
+  color: #333;
+  font-weight: 500;
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* ====== RESPONSIVE ====== */
 @media (max-width: 480px) {
   .login-form {
@@ -113,5 +145,3 @@
     width: 70px;
   }
 }
-
-
