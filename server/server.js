@@ -35,7 +35,7 @@ const USERS = "user_info";
 const PUBLIC_USER = "id, username, first_name, last_name, email, status, created_at, login_active, logout_active"
 const PRIVATE_USER = "id, username, password, first_name, last_name, email, status, created_at, login_active, logout_active"
 
-// 🧠 Helper: Safe Gemini call with retry + timeout
+//Helper: Safe Gemini call with retry + timeout
 async function safeGenerateContent(model, contents, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
@@ -60,7 +60,7 @@ async function safeGenerateContent(model, contents, retries = 3) {
   }
 }
 
-// ============ IMAGE ANALYSIS ROUTE ============
+//IMAGE ANALYSIS ROUTE 
 app.post("/api/analyze", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
@@ -164,7 +164,7 @@ Respond in a conversational, empathetic tone (max 5 sentences). Answer their spe
       conversationalAnswer = `I've analyzed your product! Here's what I found:\n\nSustainability Score: ${jsonAnalysis.greenScore}/100\n\n${jsonAnalysis.summary}\n\nFeel free to ask me any questions about this product's environmental impact!`;
     }
 
-    console.log(`✅ Analysis complete (Total scans: ${analyzedScans.length})`);
+    console.log(`Analysis complete (Total scans: ${analyzedScans.length})`);
 
     res.json({
       analysis: jsonAnalysis,  // JSON data for the display card (includes reuseIdeas)
@@ -182,7 +182,7 @@ Respond in a conversational, empathetic tone (max 5 sentences). Answer their spe
   }
 });
 
-// ============ CHAT ROUTE ============
+// CHAT ROUTE 
 app.post("/api/chat", async (req, res) => {
   try {
     const { userMessage } = req.body;
@@ -208,7 +208,7 @@ app.post("/api/chat", async (req, res) => {
     }));
 
     const prompt = `
-You are GreenLens AI, a friendly sustainability coach 🌿.
+You are GreenLens AI, a friendly sustainability coach.
 
 The user has analyzed ${analyzedScans.length} product(s). Here's the data for all of them:
 
@@ -241,7 +241,7 @@ Respond in a conversational, empathetic tone (max 5 sentences). If they ask abou
   }
 });
 
-// ============ AUTH ROUTES ============
+// AUTH ROUTES
 app.post("/api/register", async (req, res) => {
   try {
     const { username, email, password, first_name, last_name } = req.body;
@@ -333,9 +333,9 @@ app.get("/api/users/:id", async (req, res) => {
 
 // ============ ROOT ============
 app.get("/", (_req, res) => {
-  res.send("🌎 GreenLens AI API is online and running!");
+  res.send(" GreenLens AI API is online and running!");
 });
 
 app.listen(PORT, () =>
-  console.log(`✅ Server running efficiently on http://localhost:${PORT}`)
+  console.log(` Server running efficiently on http://localhost:${PORT}`)
 );
