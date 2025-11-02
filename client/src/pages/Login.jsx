@@ -2,42 +2,61 @@ import { useState } from "react";
 import "./Login.css";
 
 const Login = () => {
-  const [identifier, setIdentifier] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!username.trim()) {
+      newErrors.username = "Username is required.";
+    }
+
+    if (!password.trim()) {
+      newErrors.password = "Password is required.";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long.";
+    }
+
+    return newErrors;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
 
-    if (!identifier || !password) {
-      setMessage("⚠️ Please fill out both fields.");
+    const newErrors = validateForm();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
     try {
       setLoading(true);
-      const res = await fetch("https://greenlens-ez5z.onrender.com/api/login", {
+      setErrors({});
+      const res = await fetch("https://greenlens-50r4.onrender.com/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password }),
+        body: JSON.stringify({ identifier: username, password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Login failed.");
+        throw new Error(data.error || "Invalid username or password.");
       }
 
-      setMessage("✅ Login successful!");
+      setMessage("Login successful!");
       localStorage.setItem("user", JSON.stringify(data.user));
 
       setTimeout(() => {
         window.location.href = "/";
       }, 1000);
     } catch (err) {
-      setMessage(`❌ ${err.message}`);
+      setMessage(`Error: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -53,30 +72,34 @@ const Login = () => {
         />
         <h1 className="h3 mb-3 fw-normal">Please Login</h1>
 
-        {message && <p className="text-muted">{message}</p>}
+        {message && <p className="form-message">{message}</p>}
 
+        {/* Username */}
         <div className="form-floating">
           <input
             type="text"
-            className="form-control"
-            id="floatingInput"
-            placeholder="username"
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
+            className={`form-control ${errors.username ? "input-error" : ""}`}
+            id="floatingUsername"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
-          <label htmlFor="floatingInput">Username</label>
+          <label htmlFor="floatingUsername">Username</label>
+          {errors.username && <p className="error-text">{errors.username}</p>}
         </div>
 
+        {/* Password */}
         <div className="form-floating">
           <input
             type="password"
-            className="form-control"
+            className={`form-control ${errors.password ? "input-error" : ""}`}
             id="floatingPassword"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <label htmlFor="floatingPassword">Password</label>
+          {errors.password && <p className="error-text">{errors.password}</p>}
         </div>
 
         <div className="checkbox mb-3">

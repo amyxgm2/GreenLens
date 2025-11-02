@@ -1,131 +1,121 @@
-/* ====== BASE STYLES ====== */
-body {
-  font-family: var(--bs-body-font-family, "Segoe UI", "Helvetica Neue", Arial, sans-serif);
-  font-size: 1rem;
-  line-height: 1.5;
-  background-color: #f8f9fa;
-  margin: 0;
-  padding: 0;
-  color: #212529;
-}
-
 /* ====== MAIN CONTAINER ====== */
 .main {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   min-height: calc(100vh - 90px);
   background-color: #f8f9fa;
   padding: 2rem;
 }
 
-/* ====== FORM WRAPPER ====== */
+/* ====== REGISTER FORM ====== */
 .register--form {
   width: 100%;
-  max-width: 380px;
-  padding: 2.5rem;
+  max-width: 420px;
+  padding: 2rem;
   background-color: #fff;
   border-radius: 1rem;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
-/* ====== TITLE ====== */
 .form--title {
   margin-bottom: 1.5rem;
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: #343a40;
+  color: #1E9E1A;
+  font-weight: 700;
 }
 
-/* ====== MESSAGE BOX ====== */
-#message {
-  margin-bottom: 1.5rem;
-  padding: 0.75rem 1rem;
-  background-color: #d1e7dd; /* success background */
-  color: #0f5132; /* success text */
-  border: 1px solid #badbcc;
-  border-radius: 0.5rem;
-  font-weight: 500;
-}
-
-/* ====== INPUT GROUPS ====== */
-.register--your-info {
-  text-align: left;
-}
-
+/* ====== FORM GROUP ====== */
 .form--group {
-  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  margin-bottom: 1.5rem;
 }
 
+/* ====== LABELS (STATIC ABOVE INPUT) ====== */
 .form--group label {
-  display: block;
-  margin-bottom: 0.4rem;
-  font-weight: 500;
-  color: #495057;
-}
-
-.form--group input {
-  display: block;
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border: 1px solid #ced4da;
-  border-radius: 0.5rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-size: 0.9rem;
+  color: #1E9E1A;
+  margin-bottom: 0.35rem;
+  padding-left: 0.25rem;
   background-color: transparent;
 }
 
-.form--group input:focus {
-  outline: none;
-  border-color: #1E9E1A; /* GreenLens green */
-  box-shadow: 0 0 0 0.2rem rgba(30, 158, 26, 0.25);
+/* ====== INPUTS ====== */
+.form--group input {
+  width: 100%;
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+  padding: 0.8rem 0.75rem;
+  font-size: 1rem;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
-/* ====== ERROR TEXT ====== */
-.register--error {
-  margin-top: 0.3rem;
-  font-size: 0.875rem;
-  color: #d9534f;
+/* Focus state */
+.form--group input:focus {
+  outline: none;
+  border-color: #1E9E1A;
+}
+
+/* ====== PLACEHOLDER ====== */
+.form--group input::placeholder {
+  color: #aaa;
 }
 
 /* ====== SUBMIT BUTTON ====== */
 .form-button {
-  width: 100%;
-  padding: 0.75rem;
-  margin-top: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
+  background-color: #1E9E1A;
+  color: #fff;
   border: none;
   border-radius: 0.5rem;
-  color: #fff;
-  background-color: #1E9E1A; 
+  padding: 0.75rem 1rem;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
 }
 
 .form-button:hover {
   background-color: #157c13;
 }
 
-/* ====== SMALL TEXT ====== */
-.register--form small,
-.register--form p {
-  color: #6c757d;
-  font-size: 0.9rem;
+/* ====== MESSAGE ====== */
+#message {
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+/* ====== ERROR TEXT ====== */
+.register--error {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+  animation: fadeIn 0.2s ease-in;
+}
+
+/* ====== ERROR INPUT BORDER ====== */
+.form--group input.input-error {
+  border-color: red !important;
+  box-shadow: 0 0 4px rgba(255, 0, 0, 0.3);
+}
+
+/* ====== ANIMATION ====== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ====== RESPONSIVE ====== */
-@media (max-width: 576px) {
+@media (max-width: 480px) {
   .register--form {
     padding: 1.5rem;
-    max-width: 95%;
-  }
-}
-
-@media (min-width: 768px) {
-  .register--form {
-    padding: 3rem;
   }
 }
