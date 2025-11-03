@@ -65,7 +65,7 @@ GreenLens helps consumers make **informed, eco-friendly decisions effortlessly**
 - JSON-based communication between front end and back end
 
 ### **Database:**
-- Hosted on Render
+- Hosted on Supabase
 - Stores user credentials and scanned product data
 
 ---
@@ -79,8 +79,7 @@ GreenLens helps consumers make **informed, eco-friendly decisions effortlessly**
 ### **Branding**
 - Created the **GreenLens logo** and cohesive **color palette**:
   - Primary Green: `#1E9E1A`
-  - Accent Green: `#cde7b0`
-- Developed the tagline: *“Scan Smarter, Shop Greener.”*
+- Developed the tagline: *“Make choices that protect our planet”*
 
 ### **Homepage**
 - Communicates mission, values, and purpose.
@@ -136,7 +135,6 @@ npm run dev
 |----------|--------------|
 | **Logo** | GreenLens SVG logo visible in navbar and footer |
 | **Primary Color** | `#1E9E1A` – Deep eco green |
-| **Accent Color** | `#cde7b0` – Soft, sustainable green |
 | **Typography** | Clean sans-serif fonts for accessibility |
 
 ---
